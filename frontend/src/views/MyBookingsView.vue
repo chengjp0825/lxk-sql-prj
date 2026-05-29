@@ -1,19 +1,24 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-gray-800">我的预约</h1>
+  <div class="min-h-screen bg-slate-100">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-5xl mx-auto px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">&#x1F4C5;</span>
+          <h1 class="text-lg font-bold text-slate-800">我的预约</h1>
+        </div>
         <div class="flex items-center gap-4">
-          <router-link to="/dashboard" class="text-blue-500 hover:text-blue-600 text-sm">返回首页</router-link>
-          <span class="text-gray-600">欢迎, {{ username }}</span>
-          <button @click="handleLogout" class="text-red-500 hover:text-red-600 text-sm">退出登录</button>
+          <router-link to="/dashboard" class="text-sm text-indigo-500 hover:text-indigo-600 font-medium">返回首页</router-link>
+          <span class="text-sm text-slate-500">欢迎，{{ username }}</span>
+          <button @click="handleLogout" class="text-sm text-slate-400 hover:text-rose-500 transition-colors font-medium">退出</button>
         </div>
       </div>
     </header>
 
-    <div class="max-w-4xl mx-auto px-4 py-6">
-      <div v-if="bookings.length === 0" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-        暂无预约记录
+    <div class="max-w-5xl mx-auto px-6 py-8">
+      <div v-if="bookings.length === 0" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
+        <span class="text-4xl">&#x1F4AD;</span>
+        <p class="text-slate-400 mt-3 text-lg">暂无预约记录</p>
+        <router-link to="/dashboard" class="inline-block mt-4 text-indigo-500 hover:text-indigo-600 font-medium text-sm">去预约会议室 &rarr;</router-link>
       </div>
       <div v-else class="space-y-4">
         <BookingItem
@@ -37,9 +42,7 @@ const router = useRouter()
 const username = localStorage.getItem('username') || '用户'
 const bookings = ref([])
 
-onMounted(() => {
-  loadBookings()
-})
+onMounted(() => { loadBookings() })
 
 const loadBookings = async () => {
   try {
@@ -50,9 +53,7 @@ const loadBookings = async () => {
   }
 }
 
-const handleCancel = async () => {
-  await loadBookings()
-}
+const handleCancel = async () => { await loadBookings() }
 
 const handleLogout = () => {
   localStorage.removeItem('token')

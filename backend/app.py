@@ -303,7 +303,7 @@ def get_room_timeline(room_id):
 
             for booking in bookings:
                 if booking.start_time < slot_end and booking.end_time > current:
-                    slot_status = 'occupied'
+                    slot_status = 'pending' if booking.status == 'pending' else 'occupied'
                     break
 
             slots.append({
@@ -337,8 +337,8 @@ def create_booking():
         return jsonify({'error': 'room_id, start_time and end_time required'}), 400
 
     try:
-        start_time = datetime.fromisoformat(start_time_str.replace('Z', '+00:00'))
-        end_time = datetime.fromisoformat(end_time_str.replace('Z', '+00:00'))
+        start_time = datetime.fromisoformat(start_time_str.replace('Z', '+00:00')).replace(tzinfo=None)
+        end_time = datetime.fromisoformat(end_time_str.replace('Z', '+00:00')).replace(tzinfo=None)
     except ValueError:
         return jsonify({'error': 'Invalid datetime format'}), 400
 

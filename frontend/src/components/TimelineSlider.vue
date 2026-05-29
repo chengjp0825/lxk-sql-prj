@@ -1,13 +1,22 @@
 <template>
   <div class="mt-4">
-    <h4 class="text-sm font-medium text-gray-700 mb-2">选择时间段 (最多4小时)</h4>
-    <div class="flex flex-wrap gap-1 p-2 bg-gray-100 rounded-lg">
+    <div class="flex items-center gap-3 mb-3">
+      <h4 class="text-sm font-semibold text-slate-700">选择时间段 (最多4小时)</h4>
+      <input
+        type="date"
+        v-model="selectedDate"
+        :min="minDate"
+        class="text-sm border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+      />
+    </div>
+    <div class="flex flex-wrap gap-1 p-3 bg-slate-100 rounded-xl" @mouseleave="onMouseLeave">
       <div
         v-for="(slot, index) in slots"
         :key="index"
-        @click="toggleSlot(index)"
+        @click="onClick(index)"
+        @mouseenter="onMouseEnter(index)"
         :class="[
-          'w-8 h-8 rounded text-xs flex items-center justify-center cursor-pointer transition-colors',
+          'w-8 h-8 rounded-md text-[10px] font-medium flex items-center justify-center cursor-pointer transition-all duration-150',
           getSlotClass(slot, index)
         ]"
       >
@@ -18,11 +27,11 @@
       <span>08:00</span>
       <span>22:00</span>
     </div>
-    <div v-if="selectedRange" class="mt-2 text-sm text-gray-600">
-      已选择: {{ selectedRange.start }} - {{ selectedRange.end }}
-      <span class="text-gray-400">({{ duration }}分钟)</span>
+    <div v-if="selectedRange" class="mt-3 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg px-3 py-2">
+      已选择：{{ selectedRange.start }} - {{ selectedRange.end }}
+      <span class="text-indigo-400">（{{ duration }}分钟）</span>
     </div>
-    <div v-if="error" class="mt-2 text-sm text-red-500">{{ error }}</div>
+    <div v-if="error" class="mt-2 text-sm text-rose-500 bg-rose-50 rounded-lg px-3 py-2">{{ error }}</div>
   </div>
 </template>
 
@@ -39,10 +48,16 @@ const props = defineProps({
 
 const emit = defineEmits(['select'])
 
+const today = new Date()
+const selectedDate = ref(today.toISOString().split('T')[0])
+const minDate = today.toISOString().split('T')[0]
+
 const slots = ref([])
-const selectedIndices = ref([])
+const selectionStep = ref('IDLE')
+const startIndex = ref(null)
+const endIndex = ref(null)
+const hoverIndex = ref(null)
 const error = ref('')
-const today = new Date().toISOString().split('T')[0]
 
 const generateSlots = () => {
   const result = []
@@ -68,110 +83,140 @@ onMounted(() => {
 
 const loadTimeline = async () => {
   try {
-    const date = new Date().toISOString().split('T')[0]
-    const res = await api.get(`/rooms/${props.roomId}/timeline?date=${date}`)
+    const res = await api.get(`/rooms/${props.roomId}/timeline?date=${selectedDate.value}`)
     slots.value = res.data.slots
   } catch (e) {
     slots.value = generateSlots()
   }
 }
 
+watch(selectedDate, () => {
+  startIndex.value = null
+  endIndex.value = null
+  hoverIndex.value = null
+  selectionStep.value = 'IDLE'
+  emit('select', null)
+  loadTimeline()
+})
+
+const findObstacle = (lo, hi) => {
+  for (let i = lo; i <= hi; i++) {
+    if (slots.value[i].status !== 'available') return i
+  }
+  return -1
+}
+
 const getSlotClass = (slot, index) => {
-  if (slot.status === 'occupied') return 'bg-gray-400 text-white cursor-not-allowed'
-  if (selectedIndices.value.includes(index)) return 'bg-blue-500 text-white'
-  return 'bg-green-500 text-white hover:bg-green-600'
+  if (slot.status === 'pending') return 'bg-amber-100 text-amber-600 cursor-not-allowed shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]'
+  if (slot.status === 'occupied') return 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]'
+
+  let previewLo = null
+  let previewHi = null
+  if (selectionStep.value === 'SELECTING_END' && hoverIndex.value !== null) {
+    previewLo = Math.min(startIndex.value, hoverIndex.value)
+    previewHi = Math.max(startIndex.value, hoverIndex.value)
+    const obs = findObstacle(previewLo, previewHi)
+    if (obs >= 0) previewHi = obs - 1
+  }
+  const inPreview = previewLo !== null && index >= previewLo && index <= previewHi
+
+  if (endIndex.value !== null) {
+    const lo = Math.min(startIndex.value, endIndex.value)
+    const hi = Math.max(startIndex.value, endIndex.value)
+    if (index === startIndex.value) return 'bg-indigo-600 text-white shadow-[0_3px_0_0_rgba(67,56,202,0.4)]'
+    if (index >= lo && index <= hi) return 'bg-indigo-400 text-white shadow-[0_2px_0_0_rgba(99,102,241,0.3)]'
+  }
+
+  if (index === startIndex.value) return 'bg-indigo-500 text-white ring-2 ring-indigo-200 ring-offset-1 shadow-[0_3px_0_0_rgba(99,102,241,0.3)]'
+  if (inPreview) return 'bg-indigo-200 text-indigo-700 shadow-[0_2px_0_0_rgba(165,180,252,0.4)]'
+  return 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 shadow-[0_2px_0_0_rgba(16,185,129,0.2)] hover:shadow-[0_3px_0_0_rgba(16,185,129,0.3)] hover:-translate-y-0.5'
 }
 
-const toggleSlot = (index) => {
-  const slot = slots.value[index]
-  if (slot.status === 'occupied') return
+const onClick = (index) => {
+  if (slots.value[index].status !== 'available') return
 
-  error.value = ''
-  if (selectedIndices.value.includes(index)) {
-    selectedIndices.value = selectedIndices.value.filter(i => i !== index)
-  } else {
-    if (selectedIndices.value.length === 0) {
-      selectedIndices.value = [index]
-    } else {
-      const minIndex = Math.min(...selectedIndices.value)
-      const maxIndex = Math.max(...selectedIndices.value)
+  if (selectionStep.value === 'IDLE') {
+    error.value = ''
+    endIndex.value = null
+    startIndex.value = index
+    selectionStep.value = 'SELECTING_END'
+    hoverIndex.value = index
+    return
+  }
 
-      if (index >= minIndex && index <= maxIndex) {
-        const occupiedInRange = slots.value.slice(minIndex, maxIndex + 1).some(s => s.status === 'occupied')
-        if (occupiedInRange) {
-          selectedIndices.value = [index]
-        } else {
-          selectedIndices.value = Array.from({ length: maxIndex - minIndex + 2 }, (_, i) => minIndex + i)
-        }
-      } else if (index < minIndex) {
-        const rangeEnd = index + (maxIndex - minIndex) + 1
-        const range = Array.from({ length: minIndex - index }, (_, i) => index + i)
-        const hasOccupied = slots.value.slice(index, minIndex).some(s => s.status === 'occupied')
-        if (!hasOccupied) {
-          selectedIndices.value = [...range, ...selectedIndices.value].sort((a, b) => a - b)
-        } else {
-          selectedIndices.value = [index]
-        }
-      } else {
-        const hasOccupied = slots.value.slice(maxIndex + 1, index + 1).some(s => s.status === 'occupied')
-        if (!hasOccupied) {
-          selectedIndices.value = [...selectedIndices.value, ...Array.from({ length: index - maxIndex }, (_, i) => maxIndex + 1 + i)]
-        } else {
-          selectedIndices.value = [index]
-        }
-      }
+  if (selectionStep.value === 'SELECTING_END') {
+    if (index === startIndex.value) return
+    const lo = Math.min(startIndex.value, index)
+    const hi = Math.max(startIndex.value, index)
+
+    const obstacle = findObstacle(lo, hi)
+    if (obstacle >= 0) {
+      error.value = '选择的时间段包含已占用时间'
+      startIndex.value = null
+      endIndex.value = null
+      selectionStep.value = 'IDLE'
+      hoverIndex.value = null
+      emit('select', null)
+      return
     }
-  }
 
-  validateSelection()
+    const dur = (hi - lo) * 30
+    if (dur > 240) {
+      error.value = '单次预约最长4小时'
+      startIndex.value = null
+      endIndex.value = null
+      selectionStep.value = 'IDLE'
+      hoverIndex.value = null
+      emit('select', null)
+      return
+    }
+
+    startIndex.value = lo
+    endIndex.value = hi
+    emit('select', {
+      start: slots.value[lo].start,
+      end: slots.value[hi].start,
+      duration: dur,
+      date: selectedDate.value
+    })
+    selectionStep.value = 'IDLE'
+    hoverIndex.value = null
+  }
 }
 
-const validateSelection = () => {
-  if (selectedIndices.value.length === 0) {
-    emit('select', null)
-    return
+const onMouseEnter = (index) => {
+  if (selectionStep.value === 'SELECTING_END') {
+    hoverIndex.value = index
   }
+}
 
-  const minIdx = Math.min(...selectedIndices.value)
-  const maxIdx = Math.max(...selectedIndices.value)
-  const selectedSlots = slots.value.slice(minIdx, maxIdx + 1)
-
-  const occupied = selectedSlots.some(s => s.status === 'occupied')
-  if (occupied) {
-    error.value = '选择的时间段包含已占用时间'
-    emit('select', null)
-    return
+const onMouseLeave = () => {
+  if (selectionStep.value === 'SELECTING_END') {
+    hoverIndex.value = null
   }
-
-  const duration = (maxIdx - minIdx + 1) * 30
-  if (duration > 240) {
-    error.value = '单次预约最长4小时'
-    emit('select', null)
-    return
-  }
-
-  const firstSlot = slots.value[minIdx]
-  const lastSlot = slots.value[maxIdx]
-
-  emit('select', {
-    start: firstSlot.start,
-    end: lastSlot.end,
-    duration
-  })
 }
 
 const selectedRange = computed(() => {
-  if (selectedIndices.value.length === 0) return null
-  const minIdx = Math.min(...selectedIndices.value)
-  const maxIdx = Math.max(...selectedIndices.value)
-  return {
-    start: slots.value[minIdx].start,
-    end: slots.value[maxIdx].end
+  if (startIndex.value === null) return null
+  if (endIndex.value !== null) {
+    return { start: slots.value[startIndex.value].start, end: slots.value[endIndex.value].start }
   }
+  if (selectionStep.value === 'SELECTING_END' && hoverIndex.value !== null) {
+    const lo = Math.min(startIndex.value, hoverIndex.value)
+    const hi = Math.max(startIndex.value, hoverIndex.value)
+    return { start: slots.value[lo].start, end: slots.value[hi].start }
+  }
+  return null
 })
 
 const duration = computed(() => {
-  if (selectedIndices.value.length === 0) return 0
-  return selectedIndices.value.length * 30
+  if (startIndex.value === null) return 0
+  if (endIndex.value !== null) {
+    return Math.abs(endIndex.value - startIndex.value) * 30
+  }
+  if (hoverIndex.value !== null) {
+    return Math.abs(hoverIndex.value - startIndex.value) * 30
+  }
+  return 0
 })
 </script>

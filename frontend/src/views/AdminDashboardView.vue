@@ -34,79 +34,123 @@
     </header>
 
     <div class="max-w-7xl mx-auto px-8 py-10">
-      <!-- Stats row -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div class="rounded-xl p-5 border" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05);">
-          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Total Rooms</p>
-          <p class="text-3xl font-bold text-white">{{ rooms.length }}</p>
+      <!-- Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <div class="rounded-xl p-6 border" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05);">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Rooms</p>
+          <p class="text-4xl font-extrabold text-white">{{ rooms.length }}</p>
         </div>
-        <div class="rounded-xl p-5 border" style="background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.1);">
-          <p class="text-[10px] font-bold text-emerald-500/70 uppercase tracking-wider mb-2">Active</p>
-          <p class="text-3xl font-bold text-emerald-400">{{ activeCount }}</p>
+        <div class="rounded-xl p-6 border" style="background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.1);">
+          <p class="text-xs font-bold text-emerald-500/70 uppercase tracking-wider mb-2">Active</p>
+          <p class="text-4xl font-extrabold text-emerald-400">{{ activeCount }}</p>
         </div>
-        <div class="rounded-xl p-5 border" style="background: rgba(100,116,139,0.04); border-color: rgba(100,116,139,0.1);">
-          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Disabled</p>
-          <p class="text-3xl font-bold text-slate-400">{{ disabledCount }}</p>
+        <div class="rounded-xl p-6 border" style="background: rgba(100,116,139,0.04); border-color: rgba(100,116,139,0.1);">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Disabled</p>
+          <p class="text-4xl font-extrabold text-slate-400">{{ disabledCount }}</p>
         </div>
-        <div class="rounded-xl p-5 border" :style="pendingCount > 0 ? 'background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.15);' : 'background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05);'">
-          <p class="text-[10px] font-bold uppercase tracking-wider mb-2" :style="pendingCount > 0 ? 'color: rgba(239,68,68,0.7);' : 'color: #64748b;'">Pending</p>
-          <p class="text-3xl font-bold" :style="pendingCount > 0 ? 'color: #f87171;' : 'color: #64748b;'">{{ pendingCount }}</p>
+        <div class="rounded-xl p-6 border" :style="pendingCount > 0 ? 'background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.15);' : 'background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05);'">
+          <p class="text-xs font-bold uppercase tracking-wider mb-2" :style="pendingCount > 0 ? 'color: rgba(239,68,68,0.7);' : 'color: #64748b;'">Pending</p>
+          <p class="text-4xl font-extrabold" :style="pendingCount > 0 ? 'color: #f87171;' : 'color: #64748b;'">{{ pendingCount }}</p>
         </div>
       </div>
 
       <!-- Room Management -->
-      <div class="rounded-2xl border p-6 mb-10 shadow-[0_0_60px_rgba(99,102,241,0.03)]"
-        style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
-        <div class="flex items-end justify-between mb-6">
+      <div class="rounded-2xl border p-8 mb-10" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2 class="text-lg font-bold text-white">Rooms</h2>
-            <p class="text-xs text-slate-500 mt-1">Manage meeting rooms across all floors</p>
+            <h2 class="text-xl font-bold text-white">Meeting Rooms</h2>
+            <p class="text-sm text-slate-500 mt-1">Add, edit, or toggle room availability</p>
           </div>
-          <div class="flex gap-2">
-            <input v-model="newRoom.name" placeholder="Room name" class="w-36 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" />
-            <input v-model="newRoom.floor" placeholder="Floor" class="w-20 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" />
-            <input v-model.number="newRoom.capacity" placeholder="Cap" type="number" class="w-16 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" />
-            <button @click="createRoom" class="px-4 py-2 rounded-lg text-xs font-bold text-white transition-all active:scale-95"
-              style="background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 0 12px rgba(99,102,241,0.2);">
-              + Add Room
-            </button>
-          </div>
+          <button @click="startAdd" v-if="!adding"
+            class="px-5 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95 flex items-center gap-2"
+            style="background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 0 16px rgba(99,102,241,0.2);">
+            <span class="text-lg">+</span> Add Room
+          </button>
         </div>
 
+        <!-- Add new room form -->
+        <div v-if="adding" class="mb-6 p-5 rounded-xl border flex items-end gap-4"
+          style="background: rgba(99,102,241,0.05); border-color: rgba(99,102,241,0.15);">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Name</label>
+            <input v-model="newRoom.name" placeholder="e.g. 401研讨室" class="w-40 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Floor</label>
+            <input v-model="newRoom.floor" placeholder="e.g. 4F" class="w-24 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Capacity</label>
+            <input v-model.number="newRoom.capacity" placeholder="0" type="number" class="w-24 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" />
+          </div>
+          <button @click="createRoom" class="px-6 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95"
+            style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 0 12px rgba(16,185,129,0.2);">Create</button>
+          <button @click="cancelAdd" class="px-6 py-3 rounded-xl text-sm font-bold text-slate-400 hover:text-white transition-all border border-white/10">Cancel</button>
+        </div>
+
+        <!-- Rooms table -->
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
-              <tr class="border-b" style="border-color: rgba(255,255,255,0.04);">
-                <th class="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                <th class="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Floor</th>
-                <th class="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Capacity</th>
-                <th class="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Current</th>
-                <th class="text-left py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th class="text-right py-2.5 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Action</th>
+              <tr class="border-b" style="border-color: rgba(255,255,255,0.06);">
+                <th class="text-left py-3.5 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-48">Name</th>
+                <th class="text-left py-3.5 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Floor</th>
+                <th class="text-left py-3.5 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Capacity</th>
+                <th class="text-left py-3.5 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Now</th>
+                <th class="text-left py-3.5 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th class="text-right py-3.5 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-48">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="room in rooms" :key="room.id" class="border-b transition-colors hover:bg-white/[0.02]" style="border-color: rgba(255,255,255,0.02);">
-                <td class="py-3 px-3 text-sm font-semibold text-slate-200">{{ room.name }}</td>
-                <td class="py-3 px-3 text-xs text-slate-500">{{ room.floor }}</td>
-                <td class="py-3 px-3 text-xs text-slate-500">{{ room.capacity }}p</td>
-                <td class="py-3 px-3">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                    :style="currentStyle(room)">
+              <tr v-for="room in rooms" :key="room.id" class="border-b transition-colors hover:bg-white/[0.015]" style="border-color: rgba(255,255,255,0.03);">
+                <!-- Editable fields -->
+                <td class="py-4 px-4">
+                  <input v-if="editingId === room.id" v-model="editForm.name"
+                    class="w-full px-3 py-2 bg-white/5 border border-indigo-400/30 rounded-lg text-base font-bold text-white focus:outline-none" />
+                  <span v-else class="text-base font-bold text-slate-200">{{ room.name }}</span>
+                </td>
+                <td class="py-4 px-4">
+                  <input v-if="editingId === room.id" v-model="editForm.floor"
+                    class="w-20 px-3 py-2 bg-white/5 border border-indigo-400/30 rounded-lg text-sm text-white focus:outline-none" />
+                  <span v-else class="text-sm text-slate-400 font-medium">{{ room.floor }}</span>
+                </td>
+                <td class="py-4 px-4">
+                  <input v-if="editingId === room.id" v-model.number="editForm.capacity" type="number"
+                    class="w-20 px-3 py-2 bg-white/5 border border-indigo-400/30 rounded-lg text-sm text-white focus:outline-none" />
+                  <span v-else class="text-sm text-slate-400 font-medium">{{ room.capacity }}p</span>
+                </td>
+
+                <!-- Current status (non-editable) -->
+                <td class="py-4 px-4">
+                  <span class="text-xs font-bold px-3 py-1 rounded-full border" :style="currentStyle(room)">
                     {{ currentLabel(room) }}
                   </span>
                 </td>
-                <td class="py-3 px-3">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                    :class="room.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'">
-                    {{ room.status === 'active' ? 'Active' : 'Disabled' }}
+
+                <!-- Active/Disabled -->
+                <td class="py-4 px-4">
+                  <span :class="room.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'"
+                    class="text-xs font-bold px-3 py-1 rounded-full border">
+                    {{ room.status === 'active' ? 'Active' : 'Off' }}
                   </span>
                 </td>
-                <td class="py-3 px-3 text-right">
-                  <button @click="toggleRoomStatus(room)" class="text-xs font-medium transition-colors"
-                    :style="room.status === 'active' ? 'color: #f87171;' : 'color: #34d399;'">
-                    {{ room.status === 'active' ? 'Disable' : 'Enable' }}
-                  </button>
+
+                <!-- Actions -->
+                <td class="py-4 px-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <template v-if="editingId === room.id">
+                      <button @click="saveEdit(room)" class="px-4 py-2 rounded-lg text-xs font-bold text-white transition-all active:scale-95"
+                        style="background: linear-gradient(135deg, #10b981, #059669);">Save</button>
+                      <button @click="cancelEdit" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white border border-white/10 transition-all">Cancel</button>
+                    </template>
+                    <template v-else>
+                      <button @click="startEdit(room)" class="px-3 py-2 rounded-lg text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:bg-white/5 transition-all">Edit</button>
+                      <button @click="toggleRoomStatus(room)" class="px-3 py-2 rounded-lg text-xs font-bold transition-all"
+                        :style="room.status === 'active' ? 'color: #f87171;' : 'color: #34d399;'">
+                        {{ room.status === 'active' ? 'Disable' : 'Enable' }}
+                      </button>
+                    </template>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -115,20 +159,19 @@
       </div>
 
       <!-- Pending Bookings -->
-      <div class="rounded-2xl border p-6 shadow-[0_0_60px_rgba(99,102,241,0.03)]"
-        style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
-        <div class="flex items-center justify-between mb-6">
+      <div class="rounded-2xl border p-8" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2 class="text-lg font-bold text-white">Pending Approvals</h2>
-            <p class="text-xs text-slate-500 mt-1">Review and manage booking requests</p>
+            <h2 class="text-xl font-bold text-white">Pending Approvals</h2>
+            <p class="text-sm text-slate-500 mt-1">Review and manage booking requests</p>
           </div>
-          <span v-if="pendingCount > 0" class="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <span v-if="pendingCount > 0" class="text-sm font-bold px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
             {{ pendingCount }} pending
           </span>
         </div>
         <div v-if="pendingBookings.length === 0" class="text-center py-16">
-          <span class="text-5xl opacity-20 block mb-3">&#x2705;</span>
-          <p class="text-slate-500 text-sm">All caught up — no pending approvals</p>
+          <span class="text-6xl opacity-15 block mb-4">&#x2705;</span>
+          <p class="text-slate-500 text-base">All caught up — no pending approvals</p>
         </div>
         <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <BookingApprovalCard v-for="booking in pendingBookings" :key="booking.id" :booking="booking" @action="handleBookingAction" />
@@ -149,6 +192,11 @@ const username = localStorage.getItem('username') || 'Admin'
 const rooms = ref([])
 const pendingBookings = ref([])
 const newRoom = ref({ name: '', floor: '', capacity: '' })
+const adding = ref(false)
+
+// Edit state
+const editingId = ref(null)
+const editForm = ref({ name: '', floor: '', capacity: 0 })
 
 const activeCount = computed(() => rooms.value.filter(r => r.status === 'active').length)
 const disabledCount = computed(() => rooms.value.filter(r => r.status === 'disabled').length)
@@ -175,9 +223,31 @@ const loadData = async () => {
   } catch (e) { console.error(e) }
 }
 
+const startAdd = () => { adding.value = true; newRoom.value = { name: '', floor: '', capacity: '' } }
+const cancelAdd = () => { adding.value = false }
+
 const createRoom = async () => {
   if (!newRoom.value.name || !newRoom.value.floor || !newRoom.value.capacity) return
-  try { await api.post('/admin/rooms', newRoom.value); newRoom.value = { name: '', floor: '', capacity: '' }; await loadData() } catch (e) { console.error(e) }
+  try { await api.post('/admin/rooms', newRoom.value); adding.value = false; await loadData() } catch (e) { console.error(e) }
+}
+
+const startEdit = (room) => {
+  editingId.value = room.id
+  editForm.value = { name: room.name, floor: room.floor, capacity: room.capacity }
+}
+
+const cancelEdit = () => { editingId.value = null }
+
+const saveEdit = async (room) => {
+  try {
+    await api.put(`/admin/rooms/${room.id}`, {
+      name: editForm.value.name,
+      floor: editForm.value.floor,
+      capacity: editForm.value.capacity
+    })
+    editingId.value = null
+    await loadData()
+  } catch (e) { console.error(e) }
 }
 
 const toggleRoomStatus = async (room) => {

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 Base = declarative_base()
@@ -23,6 +23,10 @@ class Room(Base):
     floor = Column(String(10), nullable=False)
     capacity = Column(Integer, nullable=False)
     status = Column(String(20), default='active', nullable=False)
+    pos_x = Column(Float, default=0, nullable=False)
+    pos_y = Column(Float, default=0, nullable=False)
+    width_pct = Column(Float, default=15, nullable=False)
+    height_pct = Column(Float, default=12, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     bookings = relationship('Booking', back_populates='room')

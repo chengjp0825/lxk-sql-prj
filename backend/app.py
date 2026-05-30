@@ -147,7 +147,11 @@ def get_rooms():
                 'floor': room.floor,
                 'capacity': room.capacity,
                 'status': room.status,
-                'current_status': current_status
+                'current_status': current_status,
+                'pos_x': room.pos_x,
+                'pos_y': room.pos_y,
+                'width_pct': room.width_pct,
+                'height_pct': room.height_pct
             })
         return jsonify({'rooms': result}), 200
     finally:
@@ -507,9 +511,36 @@ def get_all_rooms_admin():
                 'name': room.name,
                 'floor': room.floor,
                 'capacity': room.capacity,
-                'status': room.status
+                'status': room.status,
+                'pos_x': room.pos_x,
+                'pos_y': room.pos_y,
+                'width_pct': room.width_pct,
+                'height_pct': room.height_pct
             })
         return jsonify({'rooms': result}), 200
+    finally:
+        db.close()
+
+
+@app.route('/api/admin/rooms/<int:room_id>/position', methods=['PATCH'])
+@require_admin
+def update_room_position(room_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    db = get_db()
+    try:
+        room = db.query(Room).filter(Room.id == room_id).first()
+        if not room:
+            return jsonify({'error': 'Room not found'}), 404
+
+        if 'pos_x' in data: room.pos_x = data['pos_x']
+        if 'pos_y' in data: room.pos_y = data['pos_y']
+        if 'width_pct' in data: room.width_pct = data['width_pct']
+        if 'height_pct' in data: room.height_pct = data['height_pct']
+        db.commit()
+        return jsonify({'message': 'Position updated'}), 200
     finally:
         db.close()
 

@@ -15,6 +15,21 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 engine = get_engine(DB_PATH)
 create_tables(engine)
 
+# Auto-migrate: add missing columns (KISS — no Alembic)
+def auto_migrate():
+    from sqlalchemy import text, inspect
+    insp = inspect(engine)
+    if 'bookings' in insp.get_table_names():
+        cols = [c['name'] for c in insp.get_columns('bookings')]
+        with engine.connect() as conn:
+            if 'reviewed_at' not in cols:
+                conn.execute(text('ALTER TABLE bookings ADD COLUMN reviewed_at DATETIME'))
+                conn.commit()
+            if 'admin_reason' not in cols:
+                conn.execute(text('ALTER TABLE bookings ADD COLUMN admin_reason TEXT DEFAULT ""'))
+                conn.commit()
+auto_migrate()
+
 
 def get_db():
     return get_session(engine)
@@ -268,6 +283,100 @@ def get_floor_rooms_status(floor_id):
         db.close()
 
 
+# Aggregated room range endpoint (for week/month views)
+@app.route('/api/rooms/range', methods=['GET'])
+@require_auth
+def get_rooms_range():
+    start_str = request.args.get('start')
+    end_str = request.args.get('end')
+    floor = request.args.get('floor')
+
+    if not start_str or not end_str:
+        return jsonify({'error': 'start and end query params required'}), 400
+
+    try:
+        start = datetime.strptime(start_str, '%Y-%m-%d')
+        end = datetime.strptime(end_str, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({'error': 'Invalid date format, use YYYY-MM-DD'}), 400
+
+    if start > end:
+        return jsonify({'error': 'start must be <= end'}), 400
+
+    db = get_db()
+    try:
+        query = db.query(Room).filter(Room.is_active == True)
+        if floor:
+            query = query.filter(Room.floor == floor)
+        rooms = query.all()
+
+        room_ids = [r.id for r in rooms]
+        range_end = end + timedelta(days=1)
+
+        bookings = db.query(Booking).filter(
+            Booking.room_id.in_(room_ids),
+            Booking.status.in_(['pending', 'approved']),
+            Booking.start_time < range_end,
+            Booking.end_time > start
+        ).all()
+
+        # Build lookup: (room_id, date_str) -> list of bookings
+        booking_lookup = {}
+        for b in bookings:
+            b_date = b.start_time.date()
+            # Also include the booking for all days it spans
+            span_start = max(b.start_time.date(), start.date())
+            span_end = min(b.end_time.date(), end.date())
+            cur = span_start
+            while cur <= span_end:
+                key = (b.room_id, cur.strftime('%Y-%m-%d'))
+                if key not in booking_lookup:
+                    booking_lookup[key] = []
+                booking_lookup[key].append(b)
+                cur += timedelta(days=1)
+
+        def period_status(day_bookings, sh, eh, date):
+            """sh=start_hour, eh=end_hour. Returns free/partial/busy/full."""
+            total = (eh - sh) * 2  # 30-min slots
+            occupied = 0
+            cur = datetime.combine(date, datetime.min.time().replace(hour=sh))
+            pe = datetime.combine(date, datetime.min.time().replace(hour=eh))
+            while cur < pe:
+                slot_end = cur + timedelta(minutes=30)
+                for b in day_bookings:
+                    if b.start_time < slot_end and b.end_time > cur:
+                        occupied += 1
+                        break
+                cur = slot_end
+            if occupied == 0:
+                return 'free'
+            pct = occupied / total
+            if pct <= 0.5:
+                return 'partial'
+            if pct < 1.0:
+                return 'busy'
+            return 'full'
+
+        result = []
+        for room in rooms:
+            room_data = {'id': room.id, 'name': room.name, 'floor': room.floor, 'capacity': room.capacity, 'days': {}}
+            cur_date = start
+            while cur_date <= end:
+                ds = cur_date.strftime('%Y-%m-%d')
+                day_bk = booking_lookup.get((room.id, ds), [])
+                room_data['days'][ds] = {
+                    'morning': period_status(day_bk, 8, 12, cur_date),
+                    'afternoon': period_status(day_bk, 13, 17, cur_date),
+                    'evening': period_status(day_bk, 18, 22, cur_date)
+                }
+                cur_date += timedelta(days=1)
+            result.append(room_data)
+
+        return jsonify({'rooms': result}), 200
+    finally:
+        db.close()
+
+
 # Booking endpoints
 @app.route('/api/rooms/<int:room_id>/timeline', methods=['GET'])
 @require_auth
@@ -413,7 +522,8 @@ def get_my_bookings():
         for b in bookings:
             room = db.query(Room).filter(Room.id == b.room_id).first()
             display_status = b.status
-            if b.status in ('pending', 'approved') and b.end_time < now:
+            # Only pending bookings become expired; approved bookings stay approved even if past
+            if b.status == 'pending' and b.end_time < now:
                 display_status = 'expired'
             result.append({
                 'id': b.id,
@@ -423,7 +533,9 @@ def get_my_bookings():
                 'status': display_status,
                 'reason': b.reason or '',
                 'admin_reason': b.admin_reason or '',
-                'created_at': b.created_at.isoformat()
+                'created_at': b.created_at.isoformat(),
+                'reviewed_at': b.reviewed_at.isoformat() if b.reviewed_at else None,
+                'is_past': b.end_time < now
             })
         return jsonify({'bookings': result}), 200
     finally:
@@ -507,6 +619,7 @@ def update_booking_status(booking_id):
 
         booking.status = new_status
         booking.admin_reason = admin_reason
+        booking.reviewed_at = datetime.now()
         db.commit()
         return jsonify({
             'message': f'Booking {new_status}',

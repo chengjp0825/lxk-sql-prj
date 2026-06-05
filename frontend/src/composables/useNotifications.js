@@ -4,6 +4,8 @@ import api from '../api'
 const KEY = 'booking_snapshot'
 const POLL_INTERVAL = 30000 // 30s
 
+const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+
 export function useNotifications() {
   const badge = ref(null) // { count, color } or null
   let timer = null
@@ -40,9 +42,9 @@ export function useNotifications() {
 
       const total = created + approved + rejected
       if (total > 0) {
-        let color = '#f43f5e'
-        if (approved > 0 && created === 0) color = '#10b981'
-        else if (rejected > 0 && created === 0 && approved === 0) color = '#f59e0b'
+        let color = cssVar('--status-occupied')
+        if (approved > 0 && created === 0) color = cssVar('--status-approved')
+        else if (rejected > 0 && created === 0 && approved === 0) color = cssVar('--status-pending')
         badge.value = { count: total, color }
       }
     } catch { /* ignore */ }
@@ -60,7 +62,7 @@ export function useNotifications() {
       current.forEach(b => { if (!oldIds.has(String(b.id))) created++ })
 
       if (created > 0) {
-        badge.value = { count: created, color: '#f43f5e' }
+        badge.value = { count: created, color: cssVar('--status-occupied') }
       }
       // Don't update snapshot yet — let markSeen do it
     } catch { /* ignore */ }

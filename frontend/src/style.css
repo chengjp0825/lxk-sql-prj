@@ -20,13 +20,32 @@
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-border: rgba(255, 255, 255, 0.06);
   --header-bg: rgba(10, 13, 20, 0.92);
-  --color-available: #10b981;
-  --color-occupied: #f43f5e;
-  --color-pending: #f59e0b;
-  --color-disabled: #64748b;
-  --color-available-bg: rgba(16, 185, 129, 0.08);
-  --color-occupied-bg: rgba(244, 63, 94, 0.08);
-  --color-pending-bg: rgba(245, 158, 11, 0.08);
+  /* Status colors — text/foreground */
+  --status-available: #10b981;
+  --status-occupied: #f43f5e;
+  --status-pending: #f59e0b;
+  --status-approved: #10b981;
+  --status-rejected: #f43f5e;
+  --status-cancelled: #94a3b8;
+  --status-expired: #64748b;
+  --status-disabled: #64748b;
+  --status-own: #6366f1;
+  /* Status backgrounds */
+  --status-available-bg: rgba(16, 185, 129, 0.10);
+  --status-occupied-bg: rgba(244, 63, 94, 0.12);
+  --status-pending-bg: rgba(245, 158, 11, 0.10);
+  --status-approved-bg: rgba(16, 185, 129, 0.10);
+  --status-rejected-bg: rgba(244, 63, 94, 0.08);
+  --status-cancelled-bg: rgba(148, 163, 184, 0.08);
+  --status-expired-bg: rgba(100, 116, 139, 0.06);
+  --status-disabled-bg: rgba(100, 116, 139, 0.06);
+  --status-own-bg: rgba(99, 102, 241, 0.15);
+  --status-past-bg: rgba(148, 163, 184, 0.04);
+  /* Status borders */
+  --status-available-border: rgba(16, 185, 129, 0.20);
+  --status-occupied-border: rgba(244, 63, 94, 0.18);
+  --status-pending-border: rgba(245, 158, 11, 0.18);
+  --status-own-border: rgba(99, 102, 241, 0.30);
   --toggle-active-bg: rgba(255, 255, 255, 0.08);
   --floorplan-grid: rgba(56, 189, 248, 0.06);
   --floorplan-outline: rgba(56, 189, 248, 0.2);
@@ -34,6 +53,13 @@
   --sidebar-active-bg: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.08));
   --sidebar-active-border: rgba(99,102,241,0.25);
   --sidebar-active-shadow: 0 0 20px rgba(99,102,241,0.08);
+  /* Period aggregation colors (week/month views) */
+  --period-partial: rgba(245, 158, 11, 0.12);
+  --period-partial-border: rgba(245, 158, 11, 0.22);
+  --period-busy: rgba(244, 63, 94, 0.15);
+  --period-busy-border: rgba(244, 63, 94, 0.25);
+  --period-full: rgba(244, 63, 94, 0.25);
+  --period-full-border: rgba(244, 63, 94, 0.35);
   color-scheme: dark;
 }
 
@@ -55,13 +81,32 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.08);
   --header-bg: rgba(241, 245, 249, 0.92);
-  --color-available: #10b981;
-  --color-occupied: #ef4444;
-  --color-pending: #f59e0b;
-  --color-disabled: #94a3b8;
-  --color-available-bg: rgba(16, 185, 129, 0.1);
-  --color-occupied-bg: rgba(239, 68, 68, 0.08);
-  --color-pending-bg: rgba(245, 158, 11, 0.1);
+  /* Status colors — text/foreground (light theme: darker shades for readability) */
+  --status-available: #059669;
+  --status-occupied: #e11d48;
+  --status-pending: #d97706;
+  --status-approved: #059669;
+  --status-rejected: #e11d48;
+  --status-cancelled: #64748b;
+  --status-expired: #94a3b8;
+  --status-disabled: #94a3b8;
+  --status-own: #4f46e5;
+  /* Status backgrounds */
+  --status-available-bg: rgba(16, 185, 129, 0.10);
+  --status-occupied-bg: rgba(244, 63, 94, 0.10);
+  --status-pending-bg: rgba(245, 158, 11, 0.10);
+  --status-approved-bg: rgba(16, 185, 129, 0.10);
+  --status-rejected-bg: rgba(244, 63, 94, 0.06);
+  --status-cancelled-bg: rgba(100, 116, 139, 0.08);
+  --status-expired-bg: rgba(148, 163, 184, 0.06);
+  --status-disabled-bg: rgba(148, 163, 184, 0.06);
+  --status-own-bg: rgba(99, 102, 241, 0.12);
+  --status-past-bg: rgba(148, 163, 184, 0.06);
+  /* Status borders */
+  --status-available-border: rgba(16, 185, 129, 0.25);
+  --status-occupied-border: rgba(244, 63, 94, 0.20);
+  --status-pending-border: rgba(245, 158, 11, 0.20);
+  --status-own-border: rgba(99, 102, 241, 0.35);
   --toggle-active-bg: rgba(0, 0, 0, 0.06);
   --floorplan-grid: rgba(51, 65, 85, 0.1);
   --floorplan-outline: rgba(51, 65, 85, 0.25);
@@ -69,6 +114,13 @@
   --sidebar-active-bg: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.06));
   --sidebar-active-border: rgba(99,102,241,0.35);
   --sidebar-active-shadow: 0 0 16px rgba(99,102,241,0.1);
+  /* Period aggregation colors (week/month views — light: slightly more opaque) */
+  --period-partial: rgba(217, 119, 6, 0.15);
+  --period-partial-border: rgba(217, 119, 6, 0.28);
+  --period-busy: rgba(225, 29, 72, 0.15);
+  --period-busy-border: rgba(225, 29, 72, 0.28);
+  --period-full: rgba(225, 29, 72, 0.25);
+  --period-full-border: rgba(225, 29, 72, 0.38);
   color-scheme: light;
 }
 

@@ -14,7 +14,7 @@
       <template v-else><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Time selected &mdash; click anywhere to re-select</template>
     </div>
 
-    <div v-if="nowSlotIndex >= 0" class="flex items-center gap-2 mb-2 text-[10px] font-bold" style="color: #f43f5e;">
+    <div v-if="nowSlotIndex >= 0" class="flex items-center gap-2 mb-2 text-[10px] font-bold" style="color: var(--status-occupied);">
       <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
       Current time — slots before now are locked
     </div>
@@ -37,7 +37,7 @@
         <div><p class="text-sm font-bold" style="color: #a5b4fc;">{{ selectedRange.start }} – {{ selectedRange.end }}</p><p class="text-[10px] mt-0.5" style="color: rgba(165,180,252,0.5);">{{ duration }} min &middot; {{ Math.floor(duration/60) }}h{{ duration%60 ? ` ${duration%60}m` : '' }}</p></div>
       </div>
     </div>
-    <div v-if="error" class="mt-3 text-xs rounded-lg px-4 py-2.5 flex items-center gap-2" style="background: rgba(244,63,94,0.06); border: 1px solid rgba(244,63,94,0.1); color: #fda4af;"><span>⚠</span>{{ error }}</div>
+    <div v-if="error" class="mt-3 text-xs rounded-lg px-4 py-2.5 flex items-center gap-2" style="background: var(--status-rejected-bg); border: 1px solid var(--status-occupied-border); color: var(--status-occupied);"><span>⚠</span>{{ error }}</div>
   </div>
 </template>
 
@@ -95,9 +95,9 @@ const nowMinutes = new Date().getHours()*60+new Date().getMinutes()
 const nowSlotIndex = computed(() => selectedDate.value!==todayStr ? -1 : Math.max(-1, Math.floor((nowMinutes-8*60)/30)))
 
 const slotStyle = (slot,index) => {
-  if(nowSlotIndex.value>=0&&index<=nowSlotIndex.value) return { background:'rgba(148,163,184,0.03)', color:'#334155', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.3' }
-  if(slot.status==='pending') return { background:'rgba(245,158,11,0.1)', color:'#f59e0b', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.5' }
-  if(slot.status==='occupied') return { background:'rgba(148,163,184,0.05)', color:'#475569', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.4' }
+  if(nowSlotIndex.value>=0&&index<=nowSlotIndex.value) return { background:'var(--status-past-bg)', color:'var(--text-muted)', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.3' }
+  if(slot.status==='pending') return { background:'var(--status-pending-bg)', color:'var(--status-pending)', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.5' }
+  if(slot.status==='occupied') return { background:'var(--status-occupied-bg)', color:'var(--status-occupied)', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.45' }
   const cr=confirmedRange.value; const pr=previewRange.value
   if(cr&&index>=cr.lo&&index<=cr.hi){
     if(index===startIndex.value) return { background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', borderRadius:'6px 0 0 6px' }
@@ -106,7 +106,7 @@ const slotStyle = (slot,index) => {
   }
   if(index===startIndex.value&&selectionStep.value==='SELECTING_END') return { background:'linear-gradient(135deg,#6366f1,#8b5cf6)', color:'#fff', borderRadius:'6px', boxShadow:'0 0 12px rgba(99,102,241,0.4), 0 0 0 2px rgba(99,102,241,0.15)' }
   if(pr&&index>=pr.lo&&index<=pr.hi) return { background:'rgba(99,102,241,0.1)', color:'#a5b4fc' }
-  return { background:'var(--color-available-bg)', color:'#34d399', border:'1px solid rgba(16,185,129,0.1)' }
+  return { background:'var(--status-available-bg)', color:'var(--status-available)', border:'1px solid var(--status-available-border)' }
 }
 
 const onClick = (index) => {

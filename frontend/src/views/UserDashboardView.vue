@@ -74,14 +74,14 @@
                 </div>
                 <div class="flex items-center gap-2 mt-2">
                   <span class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"
-                      :style="selectedFloor === floor ? 'box-shadow: 0 0 5px rgba(16,185,129,0.5);' : ''"></span>
-                    <span class="text-[11px] font-medium" :style="{ color: selectedFloor === floor ? '#34d399' : 'var(--text-muted)' }">{{ floorStats[floor]?.available || 0 }}</span>
+                    <span class="w-2 h-2 rounded-full" style="background: var(--status-available);"
+                      :style="selectedFloor === floor ? 'box-shadow: 0 0 5px var(--status-available);' : ''"></span>
+                    <span class="text-[11px] font-medium" :style="{ color: selectedFloor === floor ? 'var(--status-available)' : 'var(--text-muted)' }">{{ floorStats[floor]?.available || 0 }}</span>
                   </span>
                   <span class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-rose-400"
-                      :style="selectedFloor === floor ? 'box-shadow: 0 0 5px rgba(244,63,94,0.5);' : ''"></span>
-                    <span class="text-[11px] font-medium" :style="{ color: selectedFloor === floor ? '#f87171' : 'var(--text-muted)' }">{{ floorStats[floor]?.occupied || 0 }}</span>
+                    <span class="w-2 h-2 rounded-full" style="background: var(--status-occupied);"
+                      :style="selectedFloor === floor ? 'box-shadow: 0 0 5px var(--status-occupied);' : ''"></span>
+                    <span class="text-[11px] font-medium" :style="{ color: selectedFloor === floor ? 'var(--status-occupied)' : 'var(--text-muted)' }">{{ floorStats[floor]?.occupied || 0 }}</span>
                   </span>
                 </div>
               </div>
@@ -91,9 +91,9 @@
           <div class="mt-8 p-5 rounded-xl border" style="background: var(--bg-card); border-color: var(--border-subtle);">
             <p class="text-[11px] font-bold uppercase tracking-[0.25em] mb-4" style="color: var(--text-muted);">Legend</p>
             <div class="space-y-3">
-              <div class="flex items-center gap-3 text-sm"><span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)] flex-shrink-0"></span><span class="font-medium" style="color: var(--text-primary);">Available</span></div>
-              <div class="flex items-center gap-3 text-sm"><span class="w-3 h-3 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.4)] flex-shrink-0"></span><span class="font-medium" style="color: var(--text-primary);">Occupied</span></div>
-              <div class="flex items-center gap-3 text-sm"><span class="w-3 h-3 rounded-full bg-slate-600 flex-shrink-0"></span><span class="font-medium" style="color: var(--text-primary);">Closed</span></div>
+              <div class="flex items-center gap-3 text-sm"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background: var(--status-available);"></span><span class="font-medium" style="color: var(--text-primary);">Available</span></div>
+              <div class="flex items-center gap-3 text-sm"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background: var(--status-occupied);"></span><span class="font-medium" style="color: var(--text-primary);">Occupied</span></div>
+              <div class="flex items-center gap-3 text-sm"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background: var(--status-disabled);"></span><span class="font-medium" style="color: var(--text-primary);">Closed</span></div>
             </div>
           </div>
         </aside>

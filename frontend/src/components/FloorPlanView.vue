@@ -4,9 +4,9 @@
     <div class="absolute" style="top:24px;left:24px;right:24px;bottom:24px;border:3px solid var(--floorplan-outline);border-radius:4px;box-shadow:inset 0 0 60px rgba(56,189,248,0.03);"></div>
     <div class="absolute left-8 right-8 flex items-center border-y border-dashed" style="top:42%;height:40px;border-color:rgba(56,189,248,0.1);"><div class="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full" style="background:var(--floorplan-accent);box-shadow:0 0 8px var(--floorplan-accent);"></div></div>
     <div class="absolute top-5 right-5 flex gap-5 z-10 font-mono text-xs">
-      <span class="flex items-center gap-2"><span class="w-3 h-3 border" style="background:rgba(16,185,129,0.25);border-color:#10b981;"></span><span style="color:#10b981;">Available</span></span>
-      <span class="flex items-center gap-2"><span class="w-3 h-3 border" style="background:rgba(239,68,68,0.2);border-color:#ef4444;"></span><span style="color:#ef4444;">Occupied</span></span>
-      <span class="flex items-center gap-2"><span class="w-3 h-3 border" style="background:rgba(100,116,139,0.08);border-color:#475569;"></span><span style="color:#475569;">Closed</span></span>
+      <span class="flex items-center gap-2"><span class="w-3 h-3 border" style="background:var(--status-available-bg);border-color:var(--status-available);"></span><span style="color:var(--status-available);">Available</span></span>
+      <span class="flex items-center gap-2"><span class="w-3 h-3 border" style="background:var(--status-occupied-bg);border-color:var(--status-occupied);"></span><span style="color:var(--status-occupied);">Occupied</span></span>
+      <span class="flex items-center gap-2"><span class="w-3 h-3 border" style="background:var(--status-disabled-bg);border-color:var(--status-disabled);"></span><span style="color:var(--status-disabled);">Closed</span></span>
     </div>
     <div class="absolute top-5 left-5 text-center font-mono" style="color:rgba(56,189,248,0.4);"><div class="text-xs font-bold">N</div><div class="w-0.5 h-3 mx-auto mt-0.5" style="background:var(--floorplan-accent);"></div><div class="w-0 h-0 mx-auto border-4 border-transparent border-t-4" style="border-top-color:var(--floorplan-accent);"></div></div>
     <div class="absolute bottom-5 right-5 font-mono text-[9px] flex items-center gap-1" style="color:var(--floorplan-accent);"><div class="w-8 h-0.5" style="background:var(--floorplan-accent);"></div>5m</div>
@@ -34,9 +34,9 @@ let dragRoom,dragStartX,dragStartY,dragOrigX,dragOrigY,resizeRoom,resizeStartW,r
 
 const roomColors = (room) => {
   switch(room.current_status){
-    case 'available': return { bg:'rgba(16,185,129,0.1)', border:'rgba(16,185,129,0.25)', text:'#34d399' }
-    case 'occupied': return { bg:'rgba(239,68,68,0.08)', border:'rgba(239,68,68,0.18)', text:'#f87171' }
-    default: return { bg:'rgba(100,116,139,0.04)', border:'rgba(100,116,139,0.08)', text:'#64748b' }
+    case 'available': return { bg:'var(--status-available-bg)', border:'var(--status-available-border)', text:'var(--status-available)' }
+    case 'occupied': return { bg:'var(--status-occupied-bg)', border:'var(--status-occupied-border)', text:'var(--status-occupied)' }
+    default: return { bg:'var(--status-disabled-bg)', border:'var(--border-subtle)', text:'var(--status-disabled)' }
   }
 }
 const getRoomStyle = (room) => {

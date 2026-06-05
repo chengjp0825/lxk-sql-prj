@@ -44,6 +44,7 @@ class Booking(Base):
     admin_reason = Column(Text, default='', nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    reviewed_at = Column(DateTime, default=None, nullable=True)
 
     user = relationship('User', back_populates='bookings')
     room = relationship('Room', back_populates='bookings')

@@ -42,17 +42,17 @@
           <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Total Rooms</p>
           <p class="text-4xl font-extrabold" style="color: var(--text-primary);">{{ rooms.length }}</p>
         </div>
-        <div class="rounded-xl p-6 border" style="background: var(--color-available-bg); border-color: rgba(16,185,129,0.15);">
-          <p class="text-xs font-bold text-emerald-500/70 uppercase tracking-wider mb-2">Active</p>
-          <p class="text-4xl font-extrabold text-emerald-400">{{ activeCount }}</p>
+        <div class="rounded-xl p-6 border" style="background: var(--status-available-bg); border-color: var(--status-available-border);">
+          <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--status-available);">Active</p>
+          <p class="text-4xl font-extrabold" style="color: var(--status-available);">{{ activeCount }}</p>
         </div>
         <div class="rounded-xl p-6 border" style="background: var(--bg-card); border-color: var(--border-subtle);">
           <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Disabled</p>
           <p class="text-4xl font-extrabold" style="color: var(--text-secondary);">{{ disabledCount }}</p>
         </div>
-        <div class="rounded-xl p-6 border" :style="pendingCount > 0 ? 'background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2);' : 'background: var(--bg-card); border-color: var(--border-subtle);'">
-          <p class="text-xs font-bold uppercase tracking-wider mb-2" :style="pendingCount > 0 ? 'color: rgba(239,68,68,0.7);' : 'color: var(--text-muted);'">Pending</p>
-          <p class="text-4xl font-extrabold" :style="pendingCount > 0 ? 'color: #f87171;' : 'color: var(--text-secondary);'">{{ pendingCount }}</p>
+        <div class="rounded-xl p-6 border" :style="pendingCount > 0 ? `background: var(--status-occupied-bg); border-color: var(--status-occupied-border);` : 'background: var(--bg-card); border-color: var(--border-subtle);'">
+          <p class="text-xs font-bold uppercase tracking-wider mb-2" :style="pendingCount > 0 ? 'color: var(--status-occupied);' : 'color: var(--text-muted);'">Pending</p>
+          <p class="text-4xl font-extrabold" :style="pendingCount > 0 ? 'color: var(--status-occupied);' : 'color: var(--text-secondary);'">{{ pendingCount }}</p>
         </div>
       </div>
 
@@ -106,7 +106,7 @@
                     </template>
                     <template v-else>
                       <button @click="startEdit(room)" class="px-3 py-2 rounded-lg text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:bg-white/5 transition-all">Edit</button>
-                      <button @click="toggleRoomStatus(room)" class="px-3 py-2 rounded-lg text-xs font-bold transition-all" :style="room.status === 'active' ? 'color: #f87171;' : 'color: #34d399;'">{{ room.status === 'active' ? 'Disable' : 'Enable' }}</button>
+                      <button @click="toggleRoomStatus(room)" class="px-3 py-2 rounded-lg text-xs font-bold transition-all" :style="room.status === 'active' ? 'color: var(--status-occupied);' : 'color: var(--status-available);'">{{ room.status === 'active' ? 'Disable' : 'Enable' }}</button>
                     </template>
                   </div>
                 </td>
@@ -156,9 +156,9 @@ const currentLabel = (room) => {
 }
 
 const currentStyle = (room) => {
-  if (room.status === 'disabled') return { background: 'rgba(100,116,139,0.08)', borderColor: 'rgba(100,116,139,0.12)', color: '#94a3b8' }
-  if (room.current_status === 'occupied') return { background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.12)', color: '#fca5a5' }
-  return { background: 'rgba(16,185,129,0.08)', borderColor: 'rgba(16,185,129,0.12)', color: '#6ee7b7' }
+  if (room.status === 'disabled') return { background: 'var(--status-disabled-bg)', borderColor: 'var(--border-subtle)', color: 'var(--status-disabled)' }
+  if (room.current_status === 'occupied') return { background: 'var(--status-occupied-bg)', borderColor: 'var(--status-occupied-border)', color: 'var(--status-occupied)' }
+  return { background: 'var(--status-available-bg)', borderColor: 'var(--status-available-border)', color: 'var(--status-available)' }
 }
 
 onMounted(() => { loadData() })

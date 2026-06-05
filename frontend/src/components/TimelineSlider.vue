@@ -26,7 +26,7 @@
           <span v-if="shouldShowLabel(index)">{{ slot.start }}</span>
         </div>
       </div>
-      <div class="flex justify-between mt-2.5 text-[10px] font-medium" style="color: var(--text-muted);">
+      <div class="flex justify-between mt-2.5 text-[11px] font-medium" style="color: var(--text-muted);">
         <span v-for="h in hours" :key="h">{{ h }}</span>
       </div>
     </div>

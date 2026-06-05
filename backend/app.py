@@ -21,13 +21,12 @@ def auto_migrate():
     insp = inspect(engine)
     if 'bookings' in insp.get_table_names():
         cols = [c['name'] for c in insp.get_columns('bookings')]
+        new_cols = [('reviewed_at', 'DATETIME'), ('cancel_reason', 'TEXT DEFAULT ""'), ('cancelled_at', 'DATETIME')]
         with engine.connect() as conn:
-            if 'reviewed_at' not in cols:
-                conn.execute(text('ALTER TABLE bookings ADD COLUMN reviewed_at DATETIME'))
-                conn.commit()
-            if 'admin_reason' not in cols:
-                conn.execute(text('ALTER TABLE bookings ADD COLUMN admin_reason TEXT DEFAULT ""'))
-                conn.commit()
+            for col_name, col_type in new_cols:
+                if col_name not in cols:
+                    conn.execute(text(f'ALTER TABLE bookings ADD COLUMN {col_name} {col_type}'))
+                    conn.commit()
 auto_migrate()
 
 
@@ -283,6 +282,29 @@ def get_floor_rooms_status(floor_id):
         db.close()
 
 
+def _period_status(day_bookings, sh, eh, date):
+    """sh=start_hour, eh=end_hour. Returns free/partial/busy/full."""
+    total = (eh - sh) * 2  # 30-min slots
+    occupied = 0
+    cur = datetime.combine(date, datetime.min.time().replace(hour=sh))
+    pe = datetime.combine(date, datetime.min.time().replace(hour=eh))
+    while cur < pe:
+        slot_end = cur + timedelta(minutes=30)
+        for b in day_bookings:
+            if b.start_time < slot_end and b.end_time > cur:
+                occupied += 1
+                break
+        cur = slot_end
+    if occupied == 0:
+        return 'free'
+    pct = occupied / total
+    if pct <= 0.5:
+        return 'partial'
+    if pct < 1.0:
+        return 'busy'
+    return 'full'
+
+
 # Aggregated room range endpoint (for week/month views)
 @app.route('/api/rooms/range', methods=['GET'])
 @require_auth
@@ -323,39 +345,13 @@ def get_rooms_range():
         # Build lookup: (room_id, date_str) -> list of bookings
         booking_lookup = {}
         for b in bookings:
-            b_date = b.start_time.date()
-            # Also include the booking for all days it spans
             span_start = max(b.start_time.date(), start.date())
             span_end = min(b.end_time.date(), end.date())
             cur = span_start
             while cur <= span_end:
                 key = (b.room_id, cur.strftime('%Y-%m-%d'))
-                if key not in booking_lookup:
-                    booking_lookup[key] = []
-                booking_lookup[key].append(b)
+                booking_lookup.setdefault(key, []).append(b)
                 cur += timedelta(days=1)
-
-        def period_status(day_bookings, sh, eh, date):
-            """sh=start_hour, eh=end_hour. Returns free/partial/busy/full."""
-            total = (eh - sh) * 2  # 30-min slots
-            occupied = 0
-            cur = datetime.combine(date, datetime.min.time().replace(hour=sh))
-            pe = datetime.combine(date, datetime.min.time().replace(hour=eh))
-            while cur < pe:
-                slot_end = cur + timedelta(minutes=30)
-                for b in day_bookings:
-                    if b.start_time < slot_end and b.end_time > cur:
-                        occupied += 1
-                        break
-                cur = slot_end
-            if occupied == 0:
-                return 'free'
-            pct = occupied / total
-            if pct <= 0.5:
-                return 'partial'
-            if pct < 1.0:
-                return 'busy'
-            return 'full'
 
         result = []
         for room in rooms:
@@ -365,9 +361,9 @@ def get_rooms_range():
                 ds = cur_date.strftime('%Y-%m-%d')
                 day_bk = booking_lookup.get((room.id, ds), [])
                 room_data['days'][ds] = {
-                    'morning': period_status(day_bk, 8, 12, cur_date),
-                    'afternoon': period_status(day_bk, 13, 17, cur_date),
-                    'evening': period_status(day_bk, 18, 22, cur_date)
+                    'morning': _period_status(day_bk, 8, 12, cur_date),
+                    'afternoon': _period_status(day_bk, 13, 17, cur_date),
+                    'evening': _period_status(day_bk, 18, 22, cur_date)
                 }
                 cur_date += timedelta(days=1)
             result.append(room_data)
@@ -519,8 +515,12 @@ def get_my_bookings():
         bookings = db.query(Booking).filter(Booking.user_id == g.user_id).order_by(Booking.created_at.desc()).all()
         result = []
         now = datetime.now()
+        # Batch-fetch rooms to avoid N+1
+        room_ids = list({b.room_id for b in bookings})
+        rooms = db.query(Room).filter(Room.id.in_(room_ids)).all() if room_ids else []
+        room_map = {r.id: r for r in rooms}
         for b in bookings:
-            room = db.query(Room).filter(Room.id == b.room_id).first()
+            room = room_map.get(b.room_id)
             display_status = b.status
             # Only pending bookings become expired; approved bookings stay approved even if past
             if b.status == 'pending' and b.end_time < now:
@@ -535,6 +535,9 @@ def get_my_bookings():
                 'admin_reason': b.admin_reason or '',
                 'created_at': b.created_at.isoformat(),
                 'reviewed_at': b.reviewed_at.isoformat() if b.reviewed_at else None,
+                'cancelled_at': b.cancelled_at.isoformat() if b.cancelled_at else None,
+                'cancel_reason': b.cancel_reason or '',
+                'updated_at': b.updated_at.isoformat() if b.updated_at else None,
                 'is_past': b.end_time < now
             })
         return jsonify({'bookings': result}), 200
@@ -545,6 +548,11 @@ def get_my_bookings():
 @app.route('/api/bookings/<int:booking_id>', methods=['DELETE'])
 @require_auth
 def cancel_booking(booking_id):
+    data = request.get_json(silent=True) or {}
+    cancel_reason = (data.get('reason') or '').strip()
+    if not cancel_reason:
+        return jsonify({'error': '取消理由不能为空'}), 400
+
     db = get_db()
     try:
         booking = db.query(Booking).filter(Booking.id == booking_id).first()
@@ -557,10 +565,22 @@ def cancel_booking(booking_id):
         if booking.status in ['cancelled', 'rejected']:
             return jsonify({'error': 'Booking already cancelled or rejected'}), 400
 
-        if booking.start_time <= datetime.utcnow():
+        if booking.start_time <= datetime.now():
             return jsonify({'error': 'Cannot cancel started booking'}), 400
 
+        # Daily cancel limit: max 3 per user per day
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_cancels = db.query(Booking).filter(
+            Booking.user_id == g.user_id,
+            Booking.status == 'cancelled',
+            Booking.cancelled_at >= today_start
+        ).count()
+        if today_cancels >= 3:
+            return jsonify({'error': '今日取消次数已达上限（3次）'}), 400
+
         booking.status = 'cancelled'
+        booking.cancel_reason = cancel_reason
+        booking.cancelled_at = datetime.now()
         db.commit()
         return jsonify({'message': 'Booking cancelled successfully'}), 200
     finally:
@@ -573,7 +593,7 @@ def cancel_booking(booking_id):
 def get_all_pending_bookings():
     db = get_db()
     try:
-        bookings = db.query(Booking).filter(Booking.status == 'pending', Booking.end_time > datetime.now()).order_by(Booking.created_at.desc()).all()
+        bookings = db.query(Booking).filter(Booking.status.in_(['pending', 'cancelled']), Booking.end_time > datetime.now()).order_by(Booking.created_at.desc()).all()
         result = []
         for b in bookings:
             room = db.query(Room).filter(Room.id == b.room_id).first()
@@ -586,6 +606,8 @@ def get_all_pending_bookings():
                 'end_time': b.end_time.isoformat(),
                 'status': b.status,
                 'reason': b.reason or '',
+                'cancel_reason': b.cancel_reason or '',
+                'cancelled_at': b.cancelled_at.isoformat() if b.cancelled_at else None,
                 'created_at': b.created_at.isoformat()
             })
         return jsonify({'bookings': result}), 200

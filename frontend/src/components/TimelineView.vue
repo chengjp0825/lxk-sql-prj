@@ -16,14 +16,14 @@
         </div>
         <!-- Date navigation -->
         <div class="flex items-center gap-1">
-          <button @click="navBack" class="w-7 h-7 flex items-center justify-center rounded-md text-xs font-bold hover:bg-white/5 transition-colors" style="color: var(--text-secondary);">&larr;</button>
+          <button @click="navigate(-1)" class="w-7 h-7 flex items-center justify-center rounded-md text-xs font-bold hover:bg-white/5 transition-colors" style="color: var(--text-secondary);">&larr;</button>
           <!-- Day: date picker -->
           <input v-if="granularity === 'day'" type="date" v-model="selectedDate" :min="minDate"
             class="text-[11px] rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all w-34"
             style="background: var(--bg-input); border: 1px solid var(--border-strong); color: var(--text-primary)" />
           <!-- Week/Month: label -->
           <span v-else class="text-[11px] font-bold px-2 min-w-[120px] text-center" style="color: var(--text-primary);">{{ rangeLabel }}</span>
-          <button @click="navForward" class="w-7 h-7 flex items-center justify-center rounded-md text-xs font-bold hover:bg-white/5 transition-colors" style="color: var(--text-secondary);">&rarr;</button>
+          <button @click="navigate(1)" class="w-7 h-7 flex items-center justify-center rounded-md text-xs font-bold hover:bg-white/5 transition-colors" style="color: var(--text-secondary);">&rarr;</button>
         </div>
       </div>
     </div>
@@ -39,20 +39,20 @@
         </div>
         <div v-if="nowLinePos" class="absolute top-0 bottom-0 pointer-events-none z-20" :style="{ left: nowLinePos.left }">
           <div class="absolute top-0 w-px h-full" style="background: var(--status-occupied-border);"></div>
-          <div class="absolute top-0 -translate-x-1/2 px-1.5 py-0.5 rounded text-[9px] font-bold whitespace-nowrap" style="background: var(--status-occupied); color: #fff;">{{ nowLinePos.label }}</div>
+          <div class="absolute top-0 -translate-x-1/2 px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap" style="background: var(--status-occupied); color: #fff;">{{ nowLinePos.label }}</div>
         </div>
         <div v-for="room in rooms" :key="room.id" class="flex group">
-          <div @click="selectRoom(room)" class="flex-shrink-0 w-36 px-4 py-3.5 flex flex-col justify-center border-r border-b cursor-pointer transition-colors" :class="room.current_status==='available'?'hover:bg-white/[0.02]':''" style="border-color: var(--border-subtle);">
+          <div @click="selectRoom(room)" class="flex-shrink-0 w-36 px-4 py-3.5 flex flex-col justify-center border-r border-b cursor-pointer transition-colors" :class="room.current_status==='available'?'hover:bg-white/[0.05]':''" style="border-color: var(--border-subtle);">
             <p class="text-sm font-bold truncate" :style="{ color: room.current_status==='available'?'var(--text-primary)':'var(--text-muted)' }">{{ room.name }}</p>
             <p class="text-[11px] mt-1 opacity-70" :style="{ color: room.current_status==='available'?'var(--status-available)':'var(--status-occupied)' }">{{ room.capacity }}p</p>
           </div>
           <div class="flex">
-            <div v-for="(slot, si) in visibleRoomSlots(room.id)" :key="si" @click="slot.status==='available'?bookSlot(room, visibleStartIndex + si):undefined"
+            <div v-for="(slot, si) in visibleRoomSlotsMap[room.id]" :key="si" @click="slot.status==='available'?bookSlot(room, visibleStartIndex + si):undefined"
               class="flex-shrink-0 border-r border-b flex items-center justify-center"
               :class="slot.status==='available'?'cursor-pointer hover:brightness-150':''"
               :style="slotCellStyle(slot, visibleStartIndex + si)"
               :title="slot.title">
-              <span v-if="slot.status!=='available'" class="text-[9px] font-bold opacity-70">{{ slot.status==='occupied'?'BUSY':'PEND' }}</span>
+              <span v-if="slot.status!=='available'" class="text-[10px] font-bold">{{ slot.status==='occupied'?'BUSY':'PEND' }}</span>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@
         <!-- Week now-line: red vertical line on today's column + time marker -->
         <div v-if="weekNowLineLeft" class="absolute top-0 bottom-0 pointer-events-none z-20" :style="{ left: weekNowLineLeft.colPx, width: '120px' }">
           <div class="absolute top-0 left-0 w-px h-full" style="background: var(--status-occupied); opacity: 0.6;"></div>
-          <div class="absolute top-0 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold whitespace-nowrap" style="background: var(--status-occupied); color: #fff;">{{ weekNowLineLeft.label }}</div>
+          <div class="absolute top-0 left-1 px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap" style="background: var(--status-occupied); color: #fff;">{{ weekNowLineLeft.label }}</div>
           <!-- Small dot showing time position within the day -->
           <div class="absolute left-1 w-1.5 h-1.5 rounded-full" style="background: var(--status-occupied); box-shadow: 0 0 6px var(--status-occupied);" :style="{ top: `${4 + weekNowLineLeft.frac * 94}%` }"></div>
         </div>
@@ -79,7 +79,7 @@
           </div>
         </div>
         <div v-for="room in rooms" :key="room.id" class="flex group">
-          <div @click="selectRoom(room)" class="flex-shrink-0 w-36 px-4 py-3.5 flex flex-col justify-center border-r border-b cursor-pointer transition-colors hover:bg-white/[0.02]" style="border-color: var(--border-subtle);">
+          <div @click="selectRoom(room)" class="flex-shrink-0 w-36 px-4 py-3.5 flex flex-col justify-center border-r border-b cursor-pointer transition-colors hover:bg-white/[0.05]" style="border-color: var(--border-subtle);">
             <p class="text-sm font-bold truncate" :style="{ color: 'var(--text-primary)' }">{{ room.name }}</p>
             <p class="text-[11px] mt-1 opacity-70" style="color: var(--text-muted);">{{ room.capacity }}p</p>
           </div>
@@ -87,11 +87,11 @@
             <div v-for="d in weekDays" :key="d.dateStr" @click="drillToDay(d.dateStr)"
               class="flex-shrink-0 border-r border-b flex flex-col gap-[2px] justify-center p-2 cursor-pointer hover:brightness-110 transition-all"
               :style="{ width:'120px', borderColor: d.isToday ? 'var(--status-own-border)' : 'var(--border-subtle)', background: d.isToday ? 'var(--status-own-bg)' : 'transparent' }">
-              <div class="flex-1 rounded-sm flex items-center justify-center text-[9px] font-bold"
+              <div class="flex-1 rounded-sm flex items-center justify-center text-[10px] font-bold"
                 :style="periodBar(room.id, d.dateStr, 'morning')">上</div>
-              <div class="flex-1 rounded-sm flex items-center justify-center text-[9px] font-bold"
+              <div class="flex-1 rounded-sm flex items-center justify-center text-[10px] font-bold"
                 :style="periodBar(room.id, d.dateStr, 'afternoon')">下</div>
-              <div class="flex-1 rounded-sm flex items-center justify-center text-[9px] font-bold"
+              <div class="flex-1 rounded-sm flex items-center justify-center text-[10px] font-bold"
                 :style="periodBar(room.id, d.dateStr, 'evening')">晚</div>
             </div>
           </div>
@@ -112,7 +112,7 @@
           </div>
         </div>
         <div v-for="room in rooms" :key="room.id" class="flex group">
-          <div @click="selectRoom(room)" class="flex-shrink-0 w-36 px-4 py-3.5 flex flex-col justify-center border-r border-b cursor-pointer transition-colors hover:bg-white/[0.02]" style="border-color: var(--border-subtle);">
+          <div @click="selectRoom(room)" class="flex-shrink-0 w-36 px-4 py-3.5 flex flex-col justify-center border-r border-b cursor-pointer transition-colors hover:bg-white/[0.05]" style="border-color: var(--border-subtle);">
             <p class="text-sm font-bold truncate" :style="{ color: 'var(--text-primary)' }">{{ room.name }}</p>
             <p class="text-[11px] mt-1 opacity-70" style="color: var(--text-muted);">{{ room.capacity }}p</p>
           </div>
@@ -124,7 +124,7 @@
               :style="monthCellStyle(room.id, cell)"
               :title="cell.dateStr ? `${room.name} ${cell.dateStr}` : ''">
               <span>{{ cell.day }}</span>
-              <span v-if="cell.isToday" class="text-[8px] leading-none mt-0.5 font-bold px-1.5 py-px rounded-full" style="background: var(--status-occupied); color: #fff;">今天</span>
+              <span v-if="cell.isToday" class="text-[10px] leading-none mt-0.5 font-bold px-1.5 py-px rounded-full" style="background: var(--status-occupied); color: #fff;">今天</span>
             </div>
           </div>
         </div>
@@ -181,7 +181,6 @@ const nowTimeLabel = computed(() => {
 const toDate = (s) => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d) }
 const fmtDate = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-const dayNamesZh = ['日','一','二','三','四','五','六']
 
 // ---- Day view (existing) ----
 const allTimeHeaders = computed(() => {
@@ -200,7 +199,13 @@ const visibleStartIndex = computed(() => selectedDate.value !== todayStr.value? 
 const visibleSlotCount = computed(() => TOTAL_SLOTS - visibleStartIndex.value)
 const visibleTimeHeaders = computed(() => allTimeHeaders.value.slice(visibleStartIndex.value))
 const visibleStartLabel = computed(() => { const si = visibleStartIndex.value; return si < allTimeHeaders.value.length ? allTimeHeaders.value[si].label : '' })
-const visibleRoomSlots = (roomId) => (roomSlots.value[roomId] || []).slice(visibleStartIndex.value)
+const visibleRoomSlotsMap = computed(() => {
+  const map = {}
+  for (const [id, slots] of Object.entries(roomSlots.value)) {
+    map[id] = (slots || []).slice(visibleStartIndex.value)
+  }
+  return map
+})
 
 const nowLinePos = computed(() => {
   if (selectedDate.value !== todayStr.value|| granularity.value !== 'day') return null
@@ -306,20 +311,12 @@ const rangeLabel = computed(() => {
 
 // ---- Navigation ----
 const setGranularity = (g) => { granularity.value = g; rangeData.value = null }
-const navBack = () => {
+const navigate = (dir) => {
   const d = toDate(selectedDate.value)
-  if (granularity.value === 'day') d.setDate(d.getDate() - 1)
-  else if (granularity.value === 'week') d.setDate(d.getDate() - 7)
-  else if (granularity.value === 'month') d.setMonth(d.getMonth() - 1)
+  if (granularity.value === 'month') d.setMonth(d.getMonth() + dir)
+  else { const off = granularity.value === 'week' ? 7 : 1; d.setDate(d.getDate() + dir * off) }
   const nd = fmtDate(d)
-  selectedDate.value = nd >= minDate ? nd : minDate
-}
-const navForward = () => {
-  const d = toDate(selectedDate.value)
-  if (granularity.value === 'day') d.setDate(d.getDate() + 1)
-  else if (granularity.value === 'week') d.setDate(d.getDate() + 7)
-  else if (granularity.value === 'month') d.setMonth(d.getMonth() + 1)
-  selectedDate.value = fmtDate(d)
+  selectedDate.value = dir < 0 && nd < minDate ? minDate : nd
 }
 const drillToDay = (dateStr) => {
   if (dateStr < minDate) return
@@ -356,9 +353,9 @@ const getDayData = (roomId, dateStr) => {
 // Module-level period color lookup (no allocation per call)
 const PERIOD_COLORS = {
   free:    { background: 'var(--status-available-bg)', color: 'var(--status-available)', border: '1px solid var(--status-available-border)' },
-  partial: { background: 'var(--period-partial)', color: '#fcd34d', border: '1px solid var(--period-partial-border)' },
-  busy:    { background: 'var(--period-busy)', color: '#fda4af', border: '1px solid var(--period-busy-border)' },
-  full:    { background: 'var(--period-full)', color: '#fca5a5', border: '1px solid var(--period-full-border)' },
+  partial: { background: 'var(--period-partial)', color: 'var(--period-partial-text)', border: '1px solid var(--period-partial-border)' },
+  busy:    { background: 'var(--period-busy)', color: 'var(--period-busy-text)', border: '1px solid var(--period-busy-border)' },
+  full:    { background: 'var(--period-full)', color: 'var(--period-full-text)', border: '1px solid var(--period-full-border)' },
 }
 const PERIOD_DEFAULT = { background: 'var(--bg-hover)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }
 const periodColor = (status) => PERIOD_COLORS[status] || PERIOD_DEFAULT

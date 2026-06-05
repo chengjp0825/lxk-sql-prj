@@ -14,8 +14,8 @@
         <textarea v-model="reason" rows="2" class="w-full px-4 py-2.5 border rounded-xl text-sm resize-none focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong); color: var(--text-primary);" placeholder="e.g. 项目讨论、客户会议..."></textarea>
       </div>
       <div class="px-6 py-4 flex items-center gap-3 border-t" style="border-color: var(--border-subtle); background: var(--bg-hover);">
-        <button @click="$emit('close')" class="px-4 py-2.5 rounded-xl text-sm font-medium transition-all" style="color: var(--text-secondary);">Cancel</button>
-        <button @click="handleSubmit" :disabled="!selectedTime || loading" class="flex-1 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
+        <button @click="$emit('close')" class="px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-white/5" style="color: var(--text-secondary);">Cancel</button>
+        <button @click="handleSubmit" :disabled="!selectedTime || loading" class="flex-1 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
           :style="selectedTime && !loading ? 'background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; box-shadow: 0 0 20px rgba(99,102,241,0.25), 0 3px 0 0 rgba(79,70,229,0.25);' : 'background: var(--bg-input); color: var(--text-muted);'">
           <span v-if="loading" class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
           <span v-if="loading">Submitting</span><span v-else-if="success">Booked!</span><span v-else-if="selectedTime">Book {{ selectedTime.start }} – {{ selectedTime.end }}</span><span v-else>Pick a time slot</span>

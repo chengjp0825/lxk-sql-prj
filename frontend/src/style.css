@@ -60,6 +60,9 @@
   --period-busy-border: rgba(244, 63, 94, 0.25);
   --period-full: rgba(244, 63, 94, 0.25);
   --period-full-border: rgba(244, 63, 94, 0.35);
+  --period-partial-text: #fcd34d;
+  --period-busy-text: #fda4af;
+  --period-full-text: #fca5a5;
   color-scheme: dark;
 }
 
@@ -75,7 +78,7 @@
   --border-strong: rgba(0, 0, 0, 0.12);
   --text-primary: #0f172a;
   --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-muted: #64748b;
   --accent: #4f46e5;
   --accent-glow: rgba(79, 70, 229, 0.15);
   --glass-bg: rgba(255, 255, 255, 0.7);
@@ -121,6 +124,9 @@
   --period-busy-border: rgba(225, 29, 72, 0.28);
   --period-full: rgba(225, 29, 72, 0.25);
   --period-full-border: rgba(225, 29, 72, 0.38);
+  --period-partial-text: #b45309;
+  --period-busy-text: #be123c;
+  --period-full-text: #be123c;
   color-scheme: light;
 }
 

@@ -8,7 +8,7 @@
               style="background: linear-gradient(135deg, #f43f5e, #e11d48); box-shadow: 0 4px 0 0 rgba(225,29,72,0.2), 0 0 20px rgba(244,63,94,0.2);">&#x1F6E0;</div>
             <div>
               <h1 class="text-base font-extrabold tracking-tight leading-none" style="color: var(--text-primary);">Admin Panel</h1>
-              <p class="text-[10px] text-rose-400/60 font-medium tracking-wide mt-0.5">MANAGEMENT CONSOLE</p>
+              <p class="text-xs font-medium tracking-wide mt-0.5" style="color: var(--status-occupied);">MANAGEMENT CONSOLE</p>
             </div>
           </div>
           <div class="flex items-center gap-1 rounded-lg p-0.5" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">
@@ -50,9 +50,9 @@
           <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--text-muted);">Disabled</p>
           <p class="text-4xl font-extrabold" style="color: var(--text-secondary);">{{ disabledCount }}</p>
         </div>
-        <div class="rounded-xl p-6 border" :style="pendingCount > 0 ? `background: var(--status-occupied-bg); border-color: var(--status-occupied-border);` : 'background: var(--bg-card); border-color: var(--border-subtle);'">
-          <p class="text-xs font-bold uppercase tracking-wider mb-2" :style="pendingCount > 0 ? 'color: var(--status-occupied);' : 'color: var(--text-muted);'">Pending</p>
-          <p class="text-4xl font-extrabold" :style="pendingCount > 0 ? 'color: var(--status-occupied);' : 'color: var(--text-secondary);'">{{ pendingCount }}</p>
+        <div class="rounded-xl p-6 border" :style="pendingOnlyCount > 0 ? `background: var(--status-pending-bg); border-color: var(--status-pending-border);` : 'background: var(--bg-card); border-color: var(--border-subtle);'">
+          <p class="text-xs font-bold uppercase tracking-wider mb-2" :style="pendingOnlyCount > 0 ? 'color: var(--status-pending);' : 'color: var(--text-muted);'">待审批</p>
+          <p class="text-4xl font-extrabold" :style="pendingOnlyCount > 0 ? 'color: var(--status-pending);' : 'color: var(--text-secondary);'">{{ pendingOnlyCount }}</p>
         </div>
       </div>
 
@@ -65,9 +65,9 @@
 
         <div v-if="adding" class="mb-6 p-5 rounded-xl border flex items-end gap-4"
           style="background: rgba(99,102,241,0.05); border-color: rgba(99,102,241,0.15);">
-          <div><label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Name</label><input v-model="newRoom.name" placeholder="e.g. 401研讨室" class="w-40 px-4 py-3 border rounded-xl text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong);" /></div>
-          <div><label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Floor</label><input v-model="newRoom.floor" placeholder="e.g. 4F" class="w-24 px-4 py-3 border rounded-xl text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong);" /></div>
-          <div><label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Capacity</label><input v-model.number="newRoom.capacity" placeholder="0" type="number" class="w-24 px-4 py-3 border rounded-xl text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong);" /></div>
+          <div><label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Name</label><input v-model="newRoom.name" placeholder="e.g. 401研讨室" class="min-w-[160px] px-4 py-3 border rounded-xl text-base focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong); color: var(--text-primary);" /></div>
+          <div><label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Floor</label><input v-model="newRoom.floor" placeholder="e.g. 4F" class="w-24 px-4 py-3 border rounded-xl text-base focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong); color: var(--text-primary);" /></div>
+          <div><label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Capacity</label><input v-model.number="newRoom.capacity" placeholder="0" type="number" class="w-24 px-4 py-3 border rounded-xl text-base focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong); color: var(--text-primary);" /></div>
           <button @click="createRoom" class="px-6 py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 0 12px rgba(16,185,129,0.2);">Create</button>
           <button @click="cancelAdd" class="px-6 py-3 rounded-xl text-sm font-bold transition-all border" style="color: var(--text-secondary); border-color: var(--border-strong);">Cancel</button>
         </div>
@@ -106,7 +106,7 @@
                     </template>
                     <template v-else>
                       <button @click="startEdit(room)" class="px-3 py-2 rounded-lg text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:bg-white/5 transition-all">Edit</button>
-                      <button @click="toggleRoomStatus(room)" class="px-3 py-2 rounded-lg text-xs font-bold transition-all" :style="room.status === 'active' ? 'color: var(--status-occupied);' : 'color: var(--status-available);'">{{ room.status === 'active' ? 'Disable' : 'Enable' }}</button>
+                      <button @click="toggleRoomStatus(room)" class="px-3 py-2 rounded-lg text-xs font-bold transition-all hover:bg-white/5" :style="room.status === 'active' ? 'color: var(--status-occupied);' : 'color: var(--status-available);'">{{ room.status === 'active' ? 'Disable' : 'Enable' }}</button>
                     </template>
                   </div>
                 </td>
@@ -118,10 +118,13 @@
 
       <div class="rounded-2xl border p-8" style="background: var(--bg-card); border-color: var(--border-subtle);">
         <div class="flex items-center justify-between mb-8">
-          <div><h2 class="text-xl font-bold" style="color: var(--text-primary);">Pending Approvals</h2><p class="text-sm mt-1" style="color: var(--text-secondary);">Review and manage booking requests</p></div>
-          <span v-if="pendingCount > 0" class="text-sm font-bold px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">{{ pendingCount }} pending</span>
+          <div><h2 class="text-xl font-bold" style="color: var(--text-primary);">预约审批</h2><p class="text-sm mt-1" style="color: var(--text-secondary);">审核预约申请 · 查看取消记录</p></div>
+          <div class="flex items-center gap-2">
+            <span v-if="pendingOnlyCount > 0" class="text-xs font-bold px-3 py-1.5 rounded-full" style="background: var(--status-pending-bg); color: var(--status-pending); border: 1px solid var(--status-pending-border);">{{ pendingOnlyCount }} 待审</span>
+            <span v-if="cancelledOnlyCount > 0" class="text-xs font-bold px-3 py-1.5 rounded-full" style="background: var(--status-cancelled-bg); color: var(--status-cancelled); border: 1px solid var(--border-subtle);">{{ cancelledOnlyCount }} 已取消</span>
+          </div>
         </div>
-        <div v-if="pendingBookings.length === 0" class="text-center py-16"><span class="text-6xl opacity-15 block mb-4">✅</span><p class="text-base" style="color: var(--text-secondary);">All caught up — no pending approvals</p></div>
+        <div v-if="pendingBookings.length === 0" class="text-center py-16"><span class="text-6xl opacity-15 block mb-4">✅</span><p class="text-base" style="color: var(--text-secondary);">暂无待处理事项</p></div>
         <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"><BookingApprovalCard v-for="booking in pendingBookings" :key="booking.id" :booking="booking" @action="handleBookingAction" /></div>
       </div>
     </div>
@@ -129,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api'
 import BookingApprovalCard from '../components/BookingApprovalCard.vue'
@@ -147,6 +150,8 @@ const editForm = ref({ name: '', floor: '', capacity: 0 })
 
 const activeCount = computed(() => rooms.value.filter(r => r.status === 'active').length)
 const disabledCount = computed(() => rooms.value.filter(r => r.status === 'disabled').length)
+const pendingOnlyCount = computed(() => pendingBookings.value.filter(b => b.status === 'pending').length)
+const cancelledOnlyCount = computed(() => pendingBookings.value.filter(b => b.status === 'cancelled').length)
 const pendingCount = computed(() => pendingBookings.value.length)
 
 const currentLabel = (room) => {
@@ -161,7 +166,9 @@ const currentStyle = (room) => {
   return { background: 'var(--status-available-bg)', borderColor: 'var(--status-available-border)', color: 'var(--status-available)' }
 }
 
-onMounted(() => { loadData() })
+let pollTimer = null
+onMounted(() => { loadData(); pollTimer = setInterval(loadData, 30_000) })
+onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
 
 const loadData = async () => {
   try {

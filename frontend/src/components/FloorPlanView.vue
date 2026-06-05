@@ -13,7 +13,7 @@
     <div class="relative" style="height:440px;margin:32px;">
       <div v-for="room in rooms" :key="room.id" @mousedown="editable?startDrag($event,room):undefined" @click="!dragging&&selectRoom(room)"
         class="absolute border transition-all duration-200 flex flex-col items-center justify-center text-center overflow-hidden"
-        :class="[editable?'cursor-grab active:cursor-grabbing':'',room.current_status==='available'?'cursor-pointer hover:z-10':'cursor-default']"
+        :class="[editable?'cursor-grab active:cursor-grabbing':'',room.current_status==='available'?'cursor-pointer hover:z-10 hover:brightness-125':'cursor-default']"
         :style="getRoomStyle(room)">
         <span class="font-mono font-bold text-xs tracking-tight leading-none mb-1" :style="{color:roomTextClr(room)}">{{ room.name.replace(/[^0-9]/g,'') }}</span>
         <span class="text-[10px] font-mono opacity-50 leading-tight" :style="{color:roomTextClr(room)}">{{ room.capacity }}p</span>

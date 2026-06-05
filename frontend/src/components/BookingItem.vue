@@ -50,9 +50,9 @@
             <div class="flex-1 min-w-0">
               <p class="text-xs" style="color: var(--text-secondary);">
                 <span class="font-bold" :style="{ color: reviewColor }">{{ reviewLabel }}</span>
-                <span v-if="booking.reviewed_at" class="ml-2" style="color: var(--text-muted);">{{ formatTime(booking.reviewed_at) }}</span>
+                <span v-if="reviewTimestamp" class="ml-2" style="color: var(--text-muted);">{{ formatTime(reviewTimestamp) }}</span>
               </p>
-              <p v-if="booking.admin_reason" class="text-xs mt-0.5" style="color: var(--text-muted);">{{ booking.admin_reason }}</p>
+              <p v-if="reviewSubText" class="text-xs mt-0.5" style="color: var(--text-muted);">{{ reviewSubText }}</p>
             </div>
           </div>
 
@@ -70,11 +70,22 @@
       </div>
 
       <div class="mt-3 pl-10 flex items-center gap-4">
-        <button v-if="canCancel" @click="handleCancel" class="text-sm text-rose-400 hover:text-rose-300 font-medium transition-colors">取消预约</button>
+        <button v-if="canCancel" @click="showCancelDialog = true" class="text-sm text-rose-400 hover:text-rose-300 font-medium transition-colors">取消预约</button>
         <button @click="toggleTimeline" class="text-sm font-medium transition-colors flex items-center gap-1" :style="{ color: expanded ? '#a5b4fc' : 'var(--text-muted)' }">
           <span>{{ expanded ? '收起时间轴' : '查看时间轴' }}</span>
           <span class="text-[10px] transition-transform" :class="expanded ? 'rotate-180' : ''">&#x25BC;</span>
         </button>
+      </div>
+
+      <!-- Cancel confirmation dialog -->
+      <div v-if="showCancelDialog" class="mt-3 mx-5 mb-5 p-4 rounded-xl border" style="background: var(--bg-card); border-color: var(--status-occupied-border);">
+        <p class="text-sm font-bold mb-2" style="color: var(--status-occupied);">确认取消预约？</p>
+        <p class="text-xs mb-3" style="color: var(--text-secondary);">取消后不可恢复，请填写取消理由：</p>
+        <textarea v-model="cancelReason" rows="2" placeholder="请说明取消原因..." class="w-full px-3 py-2 border rounded-lg text-xs resize-none focus:outline-none focus:border-rose-400/40 transition-all mb-3" style="background: var(--bg-input); border-color: var(--border-strong); color: var(--text-primary);"></textarea>
+        <div class="flex gap-2">
+          <button @click="handleCancel" :disabled="!cancelReason.trim() || cancelling" class="px-4 py-2 rounded-lg text-xs font-bold text-white transition-all active:scale-95 disabled:opacity-40" style="background: linear-gradient(135deg, #f43f5e, #e11d48);">{{ cancelling ? '取消中...' : '确认取消' }}</button>
+          <button @click="showCancelDialog = false; cancelReason = ''" class="px-4 py-2 rounded-lg text-xs font-bold transition-all border" style="color: var(--text-secondary); border-color: var(--border-strong);">返回</button>
+        </div>
       </div>
     </div>
 
@@ -92,7 +103,7 @@
             :title="`${slot.start}–${slot.end} ${slot.status}`">
           </div>
         </div>
-        <div class="flex justify-between text-[9px] font-medium" style="color: var(--text-muted);">
+        <div class="flex justify-between text-[10px] font-medium" style="color: var(--text-muted);">
           <span>08</span><span>10</span><span>12</span><span>14</span><span>16</span><span>18</span><span>20</span><span>22</span>
         </div>
         <div class="flex items-center gap-4 mt-3 text-[10px] font-medium">
@@ -137,21 +148,20 @@ const toggleTimeline = async () => {
   }
 }
 
+const formatTimeOnly = (s) => {
+  if (!s) return ''
+  const d = new Date(s)
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+}
+const bookingStartTime = formatTimeOnly(props.booking.start_time)
+const bookingEndTime = formatTimeOnly(props.booking.end_time)
 const miniSlotStyle = (slot, index) => {
-  const bs = props.booking.start_time
-  const be = props.booking.end_time
-  if (bs && be && slot.end > formatTimeOnly(bs) && slot.start < formatTimeOnly(be)) {
+  if (bookingStartTime && bookingEndTime && slot.end > bookingStartTime && slot.start < bookingEndTime) {
     return { background: 'var(--status-own-bg)', border: '1px solid var(--status-own-border)' }
   }
   if (slot.status === 'occupied') return { background: 'var(--status-occupied-bg)', border: '1px solid var(--status-occupied-border)' }
   if (slot.status === 'pending') return { background: 'var(--status-pending-bg)', border: '1px solid var(--status-pending-border)' }
   return { background: 'var(--status-available-bg)', border: '1px solid var(--status-available-border)' }
-}
-
-const formatTimeOnly = (s) => {
-  if (!s) return ''
-  const d = new Date(s)
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
 // ---- Review step (Step 3) computed ----
@@ -181,6 +191,16 @@ const reviewDotStyle = computed(() => {
     default: return { background: 'var(--text-muted)' }
   }
 })
+const reviewTimestamp = computed(() => {
+  const s = props.booking.status
+  if (s === 'approved' || s === 'rejected') return props.booking.reviewed_at || props.booking.updated_at
+  if (s === 'cancelled') return props.booking.cancelled_at || props.booking.updated_at
+  return null
+})
+const reviewSubText = computed(() => {
+  if (props.booking.status === 'cancelled' && props.booking.cancel_reason) return props.booking.cancel_reason
+  return props.booking.admin_reason || ''
+})
 const expiryDotStyle = computed(() => {
   if (props.booking.is_past) return { background: 'var(--status-expired)' }
   return { background: 'var(--text-muted)' }
@@ -204,6 +224,13 @@ const canCancel = computed(() => {
   if (props.booking.status !== 'pending' && props.booking.status !== 'approved') return false
   return new Date(props.booking.start_time) > new Date()
 })
+const showCancelDialog = ref(false)
+const cancelReason = ref('')
+const cancelling = ref(false)
 const formatTime = (s) => { if (!s) return ''; return new Date(s).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }
-const handleCancel = async () => { try { await api.delete(`/bookings/${props.booking.id}`); emit('cancel') } catch (e) { alert(e.response?.data?.error || '取消失败') } }
+const handleCancel = async () => {
+  if (!cancelReason.value.trim()) return
+  cancelling.value = true
+  try { await api.delete(`/bookings/${props.booking.id}`, { data: { reason: cancelReason.value } }); showCancelDialog.value = false; cancelReason.value = ''; emit('cancel') } catch (e) { alert(e.response?.data?.error || '取消失败') } finally { cancelling.value = false }
+}
 </script>

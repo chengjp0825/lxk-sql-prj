@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>九号楼会议室管理系统 — 项目 Presentation</title>
+<title>九号楼会议室管理系统 — Spec-Kit + Git 驱动开发</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #0a0d14; color: #e2e8f0; line-height: 1.7; }
@@ -26,42 +26,47 @@
   .grid { display: grid; gap: 20px; }
   .grid-2 { grid-template-columns: 1fr 1fr; }
   .grid-3 { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } h1 { font-size: 2em; } }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } h1 { font-size: 2em; } }
   code { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 0.9em; color: #c4b5fd; }
   pre { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 24px; overflow-x: auto; font-size: 0.9em; }
   .arrow { color: #6366f1; font-weight: 900; }
   table { width: 100%; border-collapse: collapse; margin: 16px 0; }
   th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   th { color: #a5b4fc; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.1em; }
-  .logo { display: inline-flex; align-items: center; gap: 12px; }
-  .logo-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
   .flow-step { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
-  .flow-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; flex-shrink: 0; }
+  .flow-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0; }
   .stat { text-align: center; }
   .stat-num { font-size: 2.5em; font-weight: 900; color: #a5b4fc; }
   .stat-label { font-size: 0.85em; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; }
+  .cmd-block { background: rgba(0,0,0,0.4); border-left: 3px solid #6366f1; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 8px 0; }
+  .strict { color: #f87171; font-weight: 700; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.75em; font-weight: 700; }
+  .badge-red { background: rgba(244,63,94,0.2); color: #f87171; }
+  .badge-green { background: rgba(16,185,129,0.2); color: #34d399; }
+  .badge-amber { background: rgba(245,158,11,0.2); color: #fbbf24; }
 </style>
 </head>
 <body>
 
-<!-- Slide 1: Title -->
+<!-- ==================== Slide 1: Title ==================== -->
 <div class="slide" style="text-align:center;">
   <div class="container">
     <div style="font-size:4em;margin-bottom:0.3em;">&#x1F3E2;</div>
     <h1 style="font-size:3.5em;">九号楼会议室管理系统</h1>
-    <p class="subtitle" style="font-size:1.4em;">Building 9 Meeting Room Management System</p>
+    <p class="subtitle" style="font-size:1.4em;">Spec-Kit + Git Hooks + AI 双引擎驱动开发</p>
     <div style="margin-top:40px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <span class="tag tag-purple">Vue 3 + Vite</span>
       <span class="tag tag-green">Flask + SQLite</span>
       <span class="tag tag-amber">Spec-Kit 工作流</span>
-      <span class="tag tag-rose">Claude Code</span>
-      <span class="tag tag-purple">Gemini 2.5 Pro</span>
+      <span class="tag tag-rose">Git Hooks 自动化</span>
+      <span class="tag tag-purple">Constitution 约束</span>
     </div>
-    <p style="margin-top:60px;color:#475569;">A demonstration of AI-driven specification-first development</p>
+    <p style="margin-top:60px;color:#475569;">Specification-first · Git-integrated · AI-augmented development</p>
   </div>
 </div>
 
-<!-- Slide 2: Problem & Solution -->
+<!-- ==================== Slide 2: Problem & Solution ==================== -->
 <div class="slide">
   <div class="container">
     <h2>The Problem</h2>
@@ -69,7 +74,7 @@
       <div class="card">
         <div style="font-size:2em;margin-bottom:12px;">&#x1F464;&#x200D;&#x1F4BB;</div>
         <h3>Ghost Bookings</h3>
-        <p>口头预约但无人使用，真正需要的人"一室难求"。信息不透明导致空间浪费。</p>
+        <p>口头预约但无人使用，真正需要的人"一室难求"。信息不透明导致空间严重浪费。</p>
       </div>
       <div class="card">
         <div style="font-size:2em;margin-bottom:12px;">&#x26A0;&#xFE0F;</div>
@@ -87,264 +92,316 @@
   </div>
 </div>
 
-<!-- Slide 3: Spec-Kit Workflow -->
+<!-- ==================== Slide 3: Spec-Kit Pipeline + AI Roles ==================== -->
 <div class="slide">
   <div class="container">
-    <h2>Spec-Kit 工作流</h2>
-    <p class="subtitle">Specification-first development pipeline — 6 standard commands</p>
+    <h2>Spec-Kit 命令管线</h2>
+    <p class="subtitle">6 步强制管线 — 从自然语言到可运行代码的结构化转换</p>
     <div class="diagram" style="line-height:2.2;">
-      <div class="flow-step"><span class="flow-num" style="background:rgba(139,92,246,0.2);color:#a78bfa;">1</span> <code>/speckit-specify</code> <span class="arrow">→</span> <span>Generate <code>spec.md</code> from user description + quality checklist</span></div>
-      <div class="flow-step"><span class="flow-num" style="background:rgba(99,102,241,0.2);color:#818cf8;">2</span> <code>/speckit-plan</code> <span class="arrow">→</span> <span>Design technical implementation plan + constitution compliance check</span></div>
-      <div class="flow-step"><span class="flow-num" style="background:rgba(16,185,129,0.2);color:#34d399;">3</span> <code>/speckit-tasks</code> <span class="arrow">→</span> <span>Break plan into atomic, dependency-ordered task checklist</span></div>
-      <div class="flow-step"><span class="flow-num" style="background:rgba(245,158,11,0.2);color:#fbbf24;">4</span> <code>/speckit-analyze</code> <span class="arrow">→</span> <span>Cross-artifact consistency audit (spec↔plan↔tasks)</span></div>
-      <div class="flow-step"><span class="flow-num" style="background:rgba(244,63,94,0.2);color:#fda4af;">5</span> <code>/speckit-implement</code> <span class="arrow">→</span> <span>Execute tasks sequentially, mark <code>[x]</code> on completion</span></div>
-      <div class="flow-step"><span class="flow-num" style="background:rgba(99,102,241,0.2);color:#818cf8;">6</span> <code>/speckit-git-commit</code> <span class="arrow">→</span> <span>Auto-commit hooks after each phase (optional/mandatory)</span></div>
+      <div class="flow-step"><span class="flow-num" style="background:rgba(139,92,246,0.2);color:#a78bfa;">1</span> <code>/speckit-specify</code> <span class="arrow">→</span> 用户需求 → <code>spec.md</code> + 质量检查清单</div>
+      <div class="flow-step"><span class="flow-num" style="background:rgba(99,102,241,0.2);color:#818cf8;">2</span> <code>/speckit-plan</code> <span class="arrow">→</span> spec.md → <code>plan.md</code>（技术方案 + Constitution Check）</div>
+      <div class="flow-step"><span class="flow-num" style="background:rgba(16,185,129,0.2);color:#34d399;">3</span> <code>/speckit-tasks</code> <span class="arrow">→</span> plan.md → <code>tasks.md</code>（原子化任务 + 依赖图）</div>
+      <div class="flow-step"><span class="flow-num" style="background:rgba(245,158,11,0.2);color:#fbbf24;">4</span> <code>/speckit-analyze</code> <span class="arrow">→</span> 交叉审计 spec ↔ plan ↔ tasks 一致性</div>
+      <div class="flow-step"><span class="flow-num" style="background:rgba(244,63,94,0.2);color:#fda4af;">5</span> <code>/speckit-implement</code> <span class="arrow">→</span> 逐任务执行，完成标记 <code>[x]</code></div>
+      <div class="flow-step"><span class="flow-num" style="background:rgba(99,102,241,0.2);color:#818cf8;">6</span> <code>/speckit-git-commit</code> <span class="arrow">→</span> 每阶段结束自动提交</div>
+    </div>
+    <div class="card" style="margin-top:24px;">
+      <h3>&#x1F504; 三层协作模型</h3>
+      <div style="display:flex;align-items:center;gap:0;text-align:center;margin-top:16px;">
+        <div style="flex:1;padding:16px;border-radius:12px;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.15);">
+          <div style="font-size:2em;margin-bottom:4px;">&#x1F9E0;</div>
+          <p class="highlight">Gemini + GEM</p>
+          <p style="font-size:0.85em;color:#a78bfa;">提示词工程师</p>
+          <p style="font-size:0.8em;color:#94a3b8;">讨论需求 · 精炼提示词<br>输出 Spec-Kit user prompt</p>
+        </div>
+        <div style="font-size:1.5em;color:#6366f1;font-weight:900;padding:8px;">→</div>
+        <div style="flex:1;padding:16px;border-radius:12px;background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.15);">
+          <div style="font-size:2em;margin-bottom:4px;">&#x1F4CB;</div>
+          <p class="highlight">CC + Spec-Kit</p>
+          <p style="font-size:0.85em;color:#818cf8;">规格化管线</p>
+          <p style="font-size:0.8em;color:#94a3b8;">接收 GEM 提示词<br>spec → plan → tasks</p>
+        </div>
+        <div style="font-size:1.5em;color:#6366f1;font-weight:900;padding:8px;">→</div>
+        <div style="flex:1;padding:16px;border-radius:12px;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);">
+          <div style="font-size:2em;margin-bottom:4px;">&#x1F916;</div>
+          <p class="highlight">CC + CLAUDE.md</p>
+          <p style="font-size:0.85em;color:#34d399;">实现执行者</p>
+          <p style="font-size:0.8em;color:#94a3b8;">逐任务实现 · 构建验证<br>自动 commit</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Slide 4: Spec-Kit Architecture -->
+<!-- ==================== Slide 4: Spec-Kit × Git 联合妙用 ==================== -->
 <div class="slide">
   <div class="container">
-    <h2>Spec-Kit 架构</h2>
-    <div class="grid grid-2">
-      <div class="card">
-        <h3>&#x1F4E6; 核心产物链</h3>
-        <div class="diagram" style="line-height:2;">
-          <code>spec.md</code> <span class="arrow">→</span> <code>plan.md</code> <span class="arrow">→</span> <code>tasks.md</code> <span class="arrow">→</span> <code>implementation</code>
-        </div>
-        <p>每个产物向下游传递：用户需求 → 技术方案 → 原子任务 → 代码</p>
-      </div>
-      <div class="card">
-        <h3>&#x2699;&#xFE0F; 约束系统</h3>
-        <div class="diagram" style="line-height:2;">
-          <code>constitution.md</code> — 不可妥协的技术原则<br>
-          <code>CLAUDE.md</code> — 会话级上下文注入<br>
-          <code>extensions.yml</code> — Git hooks 自动化
-        </div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:20px;">
-      <h3>&#x1F4C1; 目录结构</h3>
-      <pre>specs/
-├── 001-meeting-room-booking/
-│   ├── spec.md              ← /speckit-specify 产出
-│   ├── plan.md              ← /speckit-plan 产出
-│   ├── tasks.md             ← /speckit-tasks 产出
-│   ├── data-model.md        ← 数据模型
-│   ├── quickstart.md        ← 快速启动指南
-│   └── contracts/           ← API 契约
-│       └── booking-api.md
-└── 002-timeline-two-click/  ← 子功能规格
-    ├── spec.md / plan.md / tasks.md
-    └── checklists/requirements.md</pre>
-    </div>
-  </div>
-</div>
+    <h2>Spec-Kit × Git 联合妙用</h2>
+    <p class="subtitle">每个 <code>/speckit-*</code> 命令前后自动触发 Git 操作 — 无需手动管理分支和提交</p>
 
-<!-- Slide 5: Git Hooks & Automation -->
-<div class="slide">
-  <div class="container">
-    <h2>Git 自动化 Hooks</h2>
-    <p class="subtitle">每个 Spec-Kit 命令前后自动触发 Git 操作</p>
+    <h3>&#x1F4CC; before / after Hooks 机制</h3>
+    <div class="diagram">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;font-size:0.95em;">
+        <span class="badge badge-green">before hook</span> <span class="arrow">→</span>
+        <code>/speckit-specify</code> <span class="arrow">→</span>
+        <span class="badge badge-amber">after hook</span> <span class="arrow">→</span>
+        <span class="badge badge-red">before hook</span> <span class="arrow">→</span>
+        <code>/speckit-plan</code> <span class="arrow">→</span>
+        <span class="badge badge-amber">after hook</span> <span class="arrow">→</span>
+        ...
+      </div>
+    </div>
+
+    <h3>&#x1F4CC; 分支即设计 — 每个 /speckit 命令触发分支工作流</h3>
+    <div class="diagram" style="text-align:center;line-height:2.2;font-size:0.95em;">
+      <span style="color:#f87171;font-weight:900;">/speckit-specify</span>
+      <span class="arrow">→</span>
+      <span class="badge badge-green">before hook</span>
+      <span class="arrow">→</span>
+      <code style="font-size:1em;">git checkout -b 003-feature-name</code>
+      <span class="arrow">→</span>
+      <span style="color:#a5b4fc;">spec.md</span>
+      <br>
+      <span style="color:#64748b;">（所有后续工作 —— plan、tasks、implement —— 都在此分支上）</span>
+      <br>
+      <span class="arrow">↓</span><br>
+      <span style="color:#34d399;">specs/003-feature-name/</span> 目录 + 所有代码提交 <span class="arrow">→</span>
+      <span style="color:#a78bfa;">merge 到 main</span>
+    </div>
+
+    <h3>&#x1F4CC; 三个关键 Hook</h3>
     <table>
-      <tr><th>Hook</th><th>触发时机</th><th>行为</th><th>强制?</th></tr>
-      <tr><td><code>speckit.git.initialize</code></td><td>before constitution</td><td><code>git init</code> — 初始化仓库</td><td><span class="tag tag-rose">强制</span></td></tr>
-      <tr><td><code>speckit.git.feature</code></td><td>before specify</td><td>创建 <code>NNN-feature-name</code> 分支</td><td><span class="tag tag-rose">强制</span></td></tr>
-      <tr><td><code>speckit.git.commit</code></td><td>after specify</td><td><code>git add -A && git commit</code></td><td><span class="tag tag-amber">可选</span></td></tr>
-      <tr><td><code>speckit.git.commit</code></td><td>before/after plan</td><td>自动提交计划变更</td><td><span class="tag tag-amber">可选</span></td></tr>
-      <tr><td><code>speckit.git.commit</code></td><td>before/after tasks</td><td>自动提交任务清单</td><td><span class="tag tag-amber">可选</span></td></tr>
-      <tr><td><code>speckit.git.commit</code></td><td>after implement</td><td>提交实现代码</td><td><span class="tag tag-amber">可选</span></td></tr>
+      <tr><th>Hook</th><th>触发时机</th><th>Git 操作</th><th>强制?</th></tr>
+      <tr><td><code>speckit.git.initialize</code></td><td>before constitution</td><td><code>git init</code> — 初始化仓库</td><td><span class="badge badge-red">强制</span></td></tr>
+      <tr><td><code>speckit.git.feature</code></td><td>before specify</td><td><code>git checkout -b 003-feature-name</code></td><td><span class="badge badge-red">强制</span></td></tr>
+      <tr><td><code>speckit.git.commit</code></td><td>after 每个阶段</td><td><code>git add -A && git commit -m "[Spec Kit] ..."</code></td><td><span class="badge badge-amber">可配置</span></td></tr>
     </table>
-    <div class="card" style="margin-top:20px;">
-      <h3>分支编号策略</h3>
-      <p><code>sequential</code> — 扫描 <code>specs/</code> 目录自动递增：<code>001-</code>, <code>002-</code>, <code>003-</code>...</p>
+
+    <h3>&#x1F4CC; extensions.yml 配置示例</h3>
+    <pre>auto_commit:
+  after_specify:  { enabled: true,  message: "[Spec Kit] Add specification" }
+  after_plan:     { enabled: true,  message: "[Spec Kit] Add implementation plan" }
+  after_tasks:    { enabled: false }
+  after_implement:{ enabled: true,  message: "[Spec Kit] Implementation complete" }</pre>
+
+    <h3>&#x1F4CC; 实际效果</h3>
+    <div class="cmd-block">
+      <code>$ git log --oneline</code><br><br>
+      <code>c16b412</code> feat: unified status colors + TimelineView day/week/month<br>
+      <code>225e700</code> docs: add project presentation<br>
+      <code>433dbba</code> docs: improve seed.py<br>
+      <code>6cc0b1d</code> feat: dual theme system<br>
+      <code>f0a4c2d</code> feat: admin inline editing<br>
+      <span style="color:#64748b;">... 11 commits total, each traceable to a Spec-Kit phase or feature</span>
     </div>
   </div>
 </div>
 
-<!-- Slide 6: Constitution as Context Constraint -->
+<!-- ==================== Slide 5: 指令严格约束 ==================== -->
 <div class="slide">
   <div class="container">
-    <h2>Constitution 上下文约束</h2>
-    <p class="subtitle"><code>.specify/memory/constitution.md</code> — 注入到每次 AI 调用的不可违背原则</p>
+    <h2>指令的严格约束</h2>
+    <p class="subtitle">每个 <code>/speckit-*</code> 命令都有不可跳过的强制门禁</p>
+
     <div class="grid grid-2">
       <div class="card">
-        <h3>&#x1F4DC; I. KISS 原则</h3>
-        <p>拒绝过度设计、拒绝企业级架构。"以最少的代码让系统跑起来"</p>
+        <h3><code>/speckit-specify</code></h3>
+        <ul style="padding-left:20px;font-size:0.95em;">
+          <li><span class="strict">最多 3 个</span> [NEEDS CLARIFICATION] 标记</li>
+          <li>自动生成 <code>checklists/requirements.md</code></li>
+          <li>质量检查清单 <span class="strict">必须全部通过</span>，否则阻塞 plan</li>
+          <li>用户描述 → 结构化用户故事 + 验收标准 + 成功指标</li>
+        </ul>
       </div>
       <div class="card">
-        <h3>&#x1F4E6; II. 锁定技术栈</h3>
-        <p>Vue 3 + Vite + Tailwind ← 前端<br>Python + Flask + SQLite ← 后端<br>禁止擅自引入其他技术</p>
+        <h3><code>/speckit-plan</code></h3>
+        <ul style="padding-left:20px;font-size:0.95em;">
+          <li><span class="strict">Constitution Check 门禁</span> — 拒绝过度设计</li>
+          <li>技术栈锁定：Vue 3 + Flask + SQLite <span class="strict">不得擅自变更</span></li>
+          <li>目录扁平化：前端三层 / 后端两文件</li>
+          <li>Phase 0 研究 → Phase 1 设计 → Phase 2 契约</li>
+        </ul>
       </div>
       <div class="card">
-        <h3>&#x1F4C1; III. 极简架构</h3>
-        <p>前端三层（components/views/api）<br>后端两文件（app.py + models.py）<br>不引入 Pinia/Blueprint 除非必要</p>
+        <h3><code>/speckit-tasks</code></h3>
+        <ul style="padding-left:20px;font-size:0.95em;">
+          <li><span class="strict">强制格式</span>：<code>- [ ] [TaskID] [P?] [Story?] 描述 + 文件路径</code></li>
+          <li>依赖关系图：标记 blocks / blockedBy</li>
+          <li>并行标记 [P] 允许多 agent 同时执行</li>
+          <li>按 User Story 组织，每个 Story 独立可测</li>
+        </ul>
       </div>
       <div class="card">
-        <h3>&#x1F512; IV. 核心业务底线</h3>
-        <p>时间段冲突判定 + 30分钟刻度轴<br><span class="highlight">绝对不可省略或妥协</span></p>
+        <h3><code>/speckit-analyze</code></h3>
+        <ul style="padding-left:20px;font-size:0.95em;">
+          <li>交叉审计 spec ↔ plan ↔ tasks <span class="strict">三项一致性</span></li>
+          <li>Checklist 不通过 → <span class="strict">阻塞 implement</span></li>
+          <li>检测未覆盖的需求、未分配的依赖</li>
+        </ul>
       </div>
     </div>
-    <div class="diagram" style="margin-top:20px;">
-      <strong>约束执行流:</strong><br>
-      Constitution → plan.md 的技术方案必须通过 "Constitution Check" 门禁<br>
-      → tasks.md 的任务分解必须符合架构约束<br>
-      → /speckit-analyze 自动检测违规
+
+    <div class="card" style="margin-top:16px;">
+      <h3><code>/speckit-implement</code> — 最严格的执行阶段</h3>
+      <ul style="padding-left:20px;">
+        <li><span class="strict">逐任务顺序执行</span> — 非 [P] 任务必须等前置完成</li>
+        <li>每个任务完成后 <span class="strict">必须标记 [x]</span> 到 tasks.md</li>
+        <li>任何非并行任务失败 → <span class="strict">整个管线中断</span></li>
+        <li>Phase 执行顺序：Setup → Tests → Core → Integration → Polish</li>
+        <li>完成后强制触发 after_implement hooks（自动 commit）</li>
+        <li><span class="strict">全程在 feature branch 上</span> — 从 specify 创建的分支开始，所有产物和代码都在同一分支上，不跨分支污染</li>
+      </ul>
     </div>
   </div>
 </div>
 
-<!-- Slide 7: Claude Code Context Constraint -->
+<!-- ==================== Slide 6: Constitution × CLAUDE.md ==================== -->
 <div class="slide">
   <div class="container">
-    <h2>Claude Code 上下文约束</h2>
-    <p class="subtitle"><code>CLAUDE.md</code> — 每次会话自动注入的项目上下文</p>
-    <div class="card">
-      <pre>&lt;!-- SPECKIT START --&gt;
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-- <strong>Implementation Plan</strong>: specs/002-timeline-two-click/plan.md
-- <strong>API Contracts</strong>: specs/001-meeting-room-booking/contracts/booking-api.md
-- <strong>Quickstart</strong>: specs/001-meeting-room-booking/quickstart.md
+    <h2>Constitution × CLAUDE.md 双重约束</h2>
+    <p class="subtitle">设计时门禁 + 运行时注入 — 确保 AI 在每一刻都遵守项目规则</p>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>&#x1F3DB;&#xFE0F; Constitution（设计时门禁）</h3>
+        <div style="padding-left:16px;border-left:3px solid #6366f1;">
+          <p><span class="highlight">I. KISS 原则</span><br>拒绝过度设计、拒绝企业级架构</p>
+          <p><span class="highlight">II. 锁定技术栈</span><br>Vue 3 + Flask + SQLite — 禁止擅自引入</p>
+          <p><span class="highlight">III. 极简架构</span><br>前端三层 / 后端两文件 / 不用 Pinia/Blueprint</p>
+          <p><span class="highlight">IV. 核心底线</span><br>时间段冲突判定 + 30分钟刻度轴 — 绝对不可妥协</p>
+        </div>
+        <p style="margin-top:12px;font-size:0.9em;color:#64748b;">plan.md 的技术方案必须通过 Constitution Check，否则阻塞 tasks 生成</p>
+      </div>
+      <div class="card">
+        <h3>&#x1F4CB; CLAUDE.md（运行时注入）</h3>
+        <div class="cmd-block" style="border-left-color:#8b5cf6;font-size:0.85em;">
+<pre>&lt;!-- SPECKIT START --&gt;
+- <strong>Implementation Plan</strong>: specs/xxx/plan.md
+- <strong>API Contracts</strong>: specs/xxx/contracts/
+- <strong>Quickstart</strong>: specs/xxx/quickstart.md
 &lt;!-- SPECKIT END --&gt;</pre>
-    </div>
-    <div class="grid grid-2" style="margin-top:20px;">
-      <div class="card">
-        <h3>&#x1F4CB; 约束效果</h3>
-        <ul style="padding-left:20px;">
-          <li>CC 自动知道当前活跃的 spec 目录</li>
-          <li>知道技术栈和项目结构</li>
-          <li>知道 API 契约和快速启动方式</li>
-          <li>Markdown 标记范围，便于 Speckit 自动更新</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>&#x1F504; 工作流集成</h3>
-        <ul style="padding-left:20px;">
-          <li><code>/speckit-plan</code> 自动更新 CLAUDE.md 指向新 plan</li>
-          <li>用户切换功能分支时上下文自动跟进</li>
-          <li>不同 spec 目录对应不同上下文</li>
-        </ul>
+        </div>
+        <p style="margin-top:12px;font-size:0.9em;color:#94a3b8;">
+          每次会话自动注入 — CC 立即知道：<br>
+          &bull; 当前活跃的 spec 目录和 plan<br>
+          &bull; API 契约和数据结构<br>
+          &bull; 项目启动方式和文件结构<br>
+          <code>/speckit-plan</code> 完成后自动更新指针
+        </p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Slide 8: Gemini GEM Custom Context -->
+<!-- ==================== Slide 7: Gemini GEM ==================== -->
 <div class="slide">
   <div class="container">
-    <h2>Gemini GEM 自定义上下文</h2>
-    <p class="subtitle">Gemini 2.5 Pro 使用的 GEM 定义 — 固化 Spec-Kit 标准指令</p>
-    <div class="card">
-      <h3>&#x1F4CB; GEM 内容（关键片段）</h3>
-      <pre>你现在是"九号楼会议室管理系统"的全栈开发工程师。
-你的核心开发哲学是 <strong>KISS (Keep It Simple, Stupid)</strong>。
+    <h2>Gemini GEM — Spec-Kit 提示词工程</h2>
+    <p class="subtitle">GEM 不写代码、不写 Spec — 它输出 Spec-Kit 命令所需的 <span class="highlight">user prompt</span></p>
 
-# 1. 严格锁定的极简技术栈
-- 前端框架：Vue 3 + Vite，必须使用 &lt;script setup&gt; 语法
-- UI 与样式：核心使用 Tailwind CSS
-- 后端框架：强制使用 Python + Flask
-- 数据库：强制使用 SQLite + SQLAlchemy（ORM）
-
-# 2. 极简代码与架构规范
-- 前端目录仅保留 components / views / api
-- 后端采用 app.py + models.py 两文件结构
-- 前端状态管理优先使用 ref/reactive，不引入 Pinia
-- 鉴权使用基础 JWT，不搞 RBAC
-
-# 3. 核心业务底线（绝对不可妥协）
-- 时间段冲突判定：必须实现严格的 Overlap 逻辑
-- 半小时刻度轴：必须实现 30 分钟最小颗粒度时间轴
-
-# 4. 代码输出要求
-- 严禁输出 ... existing code ... 占位符
-- 前端必须 npm run dev 可运行
-- 后端必须 python app.py 可直接启动</pre>
+    <h3>&#x1F3AF; GEM 的角色定位</h3>
+    <div class="diagram" style="text-align:center;line-height:2.5;">
+      <span style="color:#94a3b8;">用户模糊想法</span>
+      <span class="arrow">→</span>
+      <span style="color:#a78bfa;font-weight:900;">Gemini + GEM</span>
+      <span style="color:#64748b;">（推心置腹讨论需求 & 技术边界）</span>
+      <span class="arrow">→</span>
+      <span style="color:#fbbf24;font-weight:900;">Spec-Kit user prompt</span>
+      <span class="arrow">→</span>
+      <span style="color:#818cf8;">Claude Code 执行 /speckit-*</span>
     </div>
-    <div class="card" style="margin-top:20px;">
-      <h3>&#x1F3AF; GEM 的约束效果</h3>
-      <p>GEM 将 Constitution 的核心原则 <span class="highlight">编译为 AI 可直接执行的指令</span>。不同于 Constitution 作为"设计时的门禁检查"，GEM 在每一次代码生成时都强制 AI 遵循技术栈、架构、命名约定和交付标准。</p>
-    </div>
-  </div>
-</div>
 
-<!-- Slide 9: Gemini vs Claude Code -->
-<div class="slide">
-  <div class="container">
-    <h2>Gemini + Claude Code 分工</h2>
+    <h3>&#x1F4CB; GEM 必须深谙的 Spec-Kit 知识</h3>
     <div class="grid grid-2">
       <div class="card">
-        <div class="logo" style="margin-bottom:16px;">
-          <div class="logo-icon" style="background:linear-gradient(135deg,#4285F4,#34A853);">G</div>
-          <h3 style="margin:0;">Gemini 2.5 Pro</h3>
-        </div>
-        <p><span class="highlight">角色：规格制定者 (Specifier)</span></p>
-        <ul style="padding-left:20px;margin-top:8px;">
-          <li>接收用户原始需求描述</li>
-          <li>生成 <code>spec.md</code> 用户故事 + 验收标准</li>
-          <li>生成 <code>plan.md</code> 技术方案</li>
-          <li>生成 <code>tasks.md</code> 原子任务分解</li>
-          <li>运行 <code>/speckit-analyze</code> 一致性审计</li>
-          <li><strong>输入：GEM 上下文约束</strong></li>
-        </ul>
+        <h3>知道每个命令要什么格式的输入</h3>
+        <table style="font-size:0.9em;">
+          <tr><th>命令</th><th>GEM 输出的 user prompt 必须包含</th></tr>
+          <tr><td><code>/speckit-specify</code></td><td>Why + What + 三大场景 + 业务底线 + 成功指标</td></tr>
+          <tr><td><code>/speckit-plan</code></td><td>KISS 原则 + 技术栈确认 + 极简目录 + 分步里程碑</td></tr>
+          <tr><td><code>/speckit-tasks</code></td><td>原子化任务清单 + 验收标准 + 依赖关系</td></tr>
+          <tr><td><code>/speckit-analyze</code></td><td>审查对象 + 审查维度 + 不通过则阻塞</td></tr>
+          <tr><td><code>/speckit-implement</code></td><td>严格按 tasks.md 逐任务执行 + [x] 标记</td></tr>
+        </table>
       </div>
       <div class="card">
-        <div class="logo" style="margin-bottom:16px;">
-          <div class="logo-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">C</div>
-          <h3 style="margin:0;">Claude Code (Opus 4)</h3>
+        <h3>GEM 的核心约束内容</h3>
+        <div style="padding-left:16px;border-left:3px solid #a78bfa;font-size:0.9em;">
+          <p><span class="highlight">技术栈锁定</span><br>Vue 3 + Vite + Tailwind / Flask + SQLite + SQLAlchemy</p>
+          <p><span class="highlight">KISS 架构</span><br>前端三层 / 后端两文件 / 不引入 Pinia/Blueprint</p>
+          <p><span class="highlight">业务底线</span><br>时间段 Overlap 判定 + 30 分钟刻度轴</p>
+          <p><span class="highlight">交付标准</span><br>完整可运行 / 禁止占位符 / npm run dev 可启动</p>
+          <p><span class="highlight">Spec-Kit 精通</span><br>知道每个命令的输入格式和约束边界</p>
         </div>
-        <p><span class="highlight">角色：实现执行者 (Implementer)</span></p>
-        <ul style="padding-left:20px;margin-top:8px;">
-          <li>接收 tasks.md 任务清单</li>
-          <li>逐任务实现代码（写/编辑/构建）</li>
-          <li>运行 <code>npm run build</code> 验证</li>
-          <li>处理用户反馈和 Bug 修复</li>
-          <li>Git 提交 + 分支管理</li>
-          <li><strong>输入：CLAUDE.md + Constitution</strong></li>
-        </ul>
       </div>
     </div>
-    <div class="diagram" style="margin-top:20px;text-align:center;">
-      <strong>工作流:</strong><br>
-      <span style="color:#34A853;">User</span> <span class="arrow">→</span>
-      <span style="color:#4285F4;">Gemini (GEM约束)</span> <span class="arrow">→</span>
-      <span style="color:#94a3b8;">spec.md → plan.md → tasks.md</span> <span class="arrow">→</span>
-      <span style="color:#818cf8;">Claude Code (CLAUDE.md约束)</span> <span class="arrow">→</span>
-      <span style="color:#34d399;">Code</span>
-    </div>
-  </div>
-</div>
 
-<!-- Slide 10: Project Stats -->
-<div class="slide">
-  <div class="container">
-    <h2>项目统计</h2>
-    <div class="grid grid-3" style="margin-bottom:40px;">
-      <div class="card stat"><div class="stat-num">16</div><div class="stat-label">Vue Components/Views</div></div>
-      <div class="card stat"><div class="stat-num">2</div><div class="stat-label">Spec Directories</div></div>
-      <div class="card stat"><div class="stat-num">22</div><div class="stat-label">API Endpoints</div></div>
-      <div class="card stat"><div class="stat-num">6</div><div class="stat-label">Git Commits</div></div>
-      <div class="card stat"><div class="stat-num">3</div><div class="stat-label">View Modes</div></div>
-      <div class="card stat"><div class="stat-num">2</div><div class="stat-label">Theme Variants</div></div>
-    </div>
-    <div class="card">
-      <h3>&#x1F4E6; 交付物清单</h3>
+    <div class="card" style="margin-top:20px;">
+      <h3>&#x1F504; GEM vs Constitution vs CLAUDE.md — 三层分工</h3>
       <table>
-        <tr><th>类型</th><th>文件</th><th>说明</th></tr>
-        <tr><td>Spec</td><td><code>specs/001-meeting-room-booking/</code></td><td>主功能：spec/plan/tasks/data-model/contracts</td></tr>
-        <tr><td>Spec</td><td><code>specs/002-timeline-two-click/</code></td><td>子功能：时间轴交互重构</td></tr>
-        <tr><td>Backend</td><td><code>backend/app.py</code> (540行)</td><td>Flask 路由 + 20 个 API 端点</td></tr>
-        <tr><td>Backend</td><td><code>backend/models.py</code> (60行)</td><td>3 个 SQLAlchemy 模型</td></tr>
-        <tr><td>Backend</td><td><code>backend/seed.py</code></td><td>数据库初始化脚本</td></tr>
-        <tr><td>Frontend</td><td><code>frontend/src/</code> (16 文件)</td><td>Vue 3 + Tailwind 完整前端</td></tr>
-        <tr><td>Infra</td><td><code>.specify/</code></td><td>Spec-Kit 配置 + Constitution + 模板</td></tr>
+        <tr><th>层级</th><th>工具</th><th>产物</th><th>角色</th></tr>
+        <tr>
+          <td><span class="badge badge-purple">第 0 层</span></td>
+          <td><strong>Gemini + GEM</strong></td>
+          <td>精准的 <code>/speckit-*</code> 用户提示词</td>
+          <td>需求讨论 · 提示词精炼 — <span class="highlight">不产出代码或 spec</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">第 1 层</span></td>
+          <td><strong>Claude Code + Spec-Kit</strong></td>
+          <td><code>spec.md</code> → <code>plan.md</code> → <code>tasks.md</code></td>
+          <td>规格化管线 — Constitution Check 门禁</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">第 2 层</span></td>
+          <td><strong>Claude Code + CLAUDE.md</strong></td>
+          <td>可运行代码</td>
+          <td>逐任务实现 · 构建验证 · 自动 commit</td>
+        </tr>
       </table>
     </div>
   </div>
 </div>
 
-<!-- Slide 11: Key Learnings -->
+<!-- ==================== Slide 8: 项目统计 + 功能总览 ==================== -->
+<div class="slide">
+  <div class="container">
+    <h2>项目统计</h2>
+    <div class="grid grid-4" style="margin-bottom:30px;">
+      <div class="card stat"><div class="stat-num">11</div><div class="stat-label">Git Commits</div></div>
+      <div class="card stat"><div class="stat-num">702</div><div class="stat-label">app.py 行数</div></div>
+      <div class="card stat"><div class="stat-num">16</div><div class="stat-label">API Routes</div></div>
+      <div class="card stat"><div class="stat-num">13</div><div class="stat-label">Vue 组件/视图</div></div>
+    </div>
+
+    <h3>&#x1F4E6; Spec-Kit → 功能映射</h3>
+    <table>
+      <tr><th>Spec 目录</th><th>驱动功能</th><th>关键命令</th></tr>
+      <tr>
+        <td><code>specs/001-meeting-room-booking/</code></td>
+        <td>JWT 鉴权 · 房间 CRUD · 预约引擎 · 30分时间轴 · 审批流 · 状态看板</td>
+        <td><span class="badge badge-green">specify → plan → tasks → implement</span></td>
+      </tr>
+      <tr>
+        <td><code>specs/002-timeline-two-click/</code></td>
+        <td>两击选择 · hover 预览 · 碰撞检测 · now-line 指示器 · 状态机交互</td>
+        <td><span class="badge badge-green">specify → plan → tasks → implement</span></td>
+      </tr>
+    </table>
+
+    <h3>&#x2728; Constitution 约束下的增量功能</h3>
+    <p style="margin-bottom:8px;">以下功能未创建独立 spec，但在 Constitution 的 KISS 原则下自然演进：</p>
+    <table>
+      <tr><th>功能</th><th>涉及文件</th></tr>
+      <tr><td>亮/暗双主题切换</td><td><code>style.css</code>（CSS 变量体系）+ <code>useTheme.js</code></td></tr>
+      <tr><td>日/周/月三粒度时间轴</td><td><code>TimelineView.vue</code> + <code>GET /api/rooms/range</code></td></tr>
+      <tr><td>防呆体系（理由/过期/取消限额/生命周期）</td><td><code>BookingItem.vue</code> + <code>BookingApprovalCard.vue</code></td></tr>
+      <tr><td>鸟瞰楼层平面图（拖拽定位）</td><td><code>FloorPlanView.vue</code> + <code>PATCH /api/admin/rooms/:id/position</code></td></tr>
+      <tr><td>通知徽章轮询 + Admin/用户双端自动刷新</td><td><code>useNotifications.js</code> + <code>AdminDashboardView</code> + <code>MyBookingsView</code></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== Slide 9: 关键经验 ==================== -->
 <div class="slide">
   <div class="container">
     <h2>关键经验</h2>
@@ -352,42 +409,44 @@ shell commands, and other important information, read the current plan:
       <div class="card">
         <h3>&#x2705; 有效的</h3>
         <ul style="padding-left:20px;">
-          <li><strong>Spec-first 流程</strong> — 规格先行避免了需求漂移</li>
-          <li><strong>Constitution 约束</strong> — 防止了技术栈蔓延和过度设计</li>
-          <li><strong>AI 分工协作</strong> — Gemini 做规划、Claude Code 做实现互补</li>
-          <li><strong>自动化 Git hooks</strong> — 每次 spec 变更自动提交/分支</li>
-          <li><strong>CLAUDE.md 上下文注入</strong> — CC 立即理解项目结构和当前任务</li>
-          <li><strong>质量检查清单</strong> — specs/checklists 确保规格完整性</li>
+          <li><strong>Spec-first 防漂移</strong> — 需求在代码之前被锁定和审计</li>
+          <li><strong>Git Hooks 自动化</strong> — 零手动 commit，每个阶段可追溯</li>
+          <li><strong>Checklist 质量门禁</strong> — analyze 不通过 = implement 拒绝执行</li>
+          <li><strong>AI 分工互补</strong> — Gemini 规划 + Claude Code 实现，各司其职</li>
+          <li><strong>Constitution 防蔓延</strong> — 阻止了 Pinia/Blueprint/重型库的引入</li>
+          <li><strong>CSS 变量体系统一</strong> — 亮/暗主题切换零额外成本</li>
+          <li><strong>CLAUDE.md 上下文注入</strong> — CC 立即理解项目全貌</li>
         </ul>
       </div>
       <div class="card">
-        <h3>&#x26A0;&#xFE0F; 待改进的</h3>
+        <h3>&#x26A0;&#xFE0F; 待改进</h3>
         <ul style="padding-left:20px;">
-          <li><strong>UI 迭代过多</strong> — 缺少 upfront 设计稿，靠反馈循环调整</li>
-          <li><strong>测试缺失</strong> — 依赖手动验证，缺少自动化测试</li>
-          <li><strong>数据库迁移</strong> — seed.py 简单但缺少版本化迁移</li>
-          <li><strong>移动端适配</strong> — 目前仅桌面端</li>
-          <li><strong>时区处理</strong> — 需要更健壮的 UTC/本地时间策略</li>
+          <li><strong>UI 迭代类任务 Spec-Kit 适配差</strong> — "改好看点"无法结构化</li>
+          <li><strong>自动化测试缺失</strong> — 依赖手动验证和构建检查</li>
+          <li><strong>数据库迁移方案简陋</strong> — auto_migrate 能工作但不够健壮</li>
+          <li><strong>移动端未适配</strong> — 目前仅桌面端可用</li>
+          <li><strong>时区策略需加固</strong> — datetime.now vs UTC 的边界处理</li>
         </ul>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Slide 12: Thank You -->
+<!-- ==================== Slide 10: Thank You ==================== -->
 <div class="slide" style="text-align:center;">
   <div class="container">
     <div style="font-size:4em;margin-bottom:0.3em;">&#x1F3E2;</div>
     <h1 style="font-size:2.5em;">Thank You</h1>
     <p class="subtitle" style="font-size:1.2em;margin-bottom:40px;">
-      AI-driven specification-first development<br>
-      with Spec-Kit, Gemini GEM &amp; Claude Code
+      Spec-Kit + Git Hooks + AI 双引擎<br>
+      从自然语言到可运行代码的结构化管线
     </p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <span class="tag tag-purple">Spec-Kit v0.8.16</span>
-      <span class="tag tag-green">Constitution v1.0</span>
-      <span class="tag tag-amber">14 Components</span>
-      <span class="tag tag-rose">Dual Theme</span>
+      <span class="tag tag-purple">Spec-Kit</span>
+      <span class="tag tag-green">11 Commits</span>
+      <span class="tag tag-amber">16 Routes</span>
+      <span class="tag tag-rose">13 Components</span>
+      <span class="tag tag-purple">Dual Theme</span>
     </div>
     <p style="margin-top:60px;color:#475569;font-size:0.9em;">
       GitHub: <code>chengjp0825/lxk-sql-prj</code>

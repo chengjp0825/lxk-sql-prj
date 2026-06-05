@@ -9,7 +9,7 @@
         <div class="flex items-center gap-5">
           <router-link to="/dashboard" class="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors">返回首页</router-link>
           <span class="text-sm" style="color: var(--text-secondary);">欢迎，{{ username }}</span>
-          <button @click="handleLogout" class="text-sm font-medium transition-colors" style="color: var(--text-muted);">退出</button>
+          <button @click="handleLogout" class="text-sm font-medium transition-colors hover:text-rose-400" style="color: var(--text-muted);">退出</button>
         </div>
       </div>
     </header>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api'
 import BookingItem from '../components/BookingItem.vue'
@@ -33,7 +33,9 @@ const router = useRouter()
 const username = localStorage.getItem('username') || '用户'
 const bookings = ref([])
 const KEY = 'booking_snapshot'
-onMounted(() => { api.get('/bookings/my').then(res => { const map = {}; (res.data.bookings||[]).forEach(b => { map[b.id]=b.status }); map._init=true; localStorage.setItem(KEY,JSON.stringify(map)) }).catch(()=>{}); loadBookings() })
+let pollTimer = null
+onMounted(() => { api.get('/bookings/my').then(res => { const map = {}; (res.data.bookings||[]).forEach(b => { map[b.id]=b.status }); map._init=true; localStorage.setItem(KEY,JSON.stringify(map)) }).catch(()=>{}); loadBookings(); pollTimer = setInterval(loadBookings, 30_000) })
+onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
 const loadBookings = async () => { try { const res = await api.get('/bookings/my'); bookings.value = res.data.bookings } catch (e) { console.error(e) } }
 const handleCancel = async () => { await loadBookings() }
 const handleLogout = () => { localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('username'); router.push('/login') }

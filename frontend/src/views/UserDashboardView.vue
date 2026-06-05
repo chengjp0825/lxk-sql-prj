@@ -9,7 +9,7 @@
               style="background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 4px 0 0 rgba(79,70,229,0.2), 0 0 20px rgba(99,102,241,0.2);">&#x1F3E2;</div>
             <div>
               <h1 class="text-base font-extrabold tracking-tight leading-none" style="color: var(--text-primary);">Building 9</h1>
-              <p class="text-[10px] font-medium tracking-wide mt-0.5" style="color: var(--text-muted);">MEETING ROOM SYSTEM</p>
+              <p class="text-xs font-medium tracking-wide mt-0.5" style="color: var(--text-secondary);">MEETING ROOM SYSTEM</p>
             </div>
           </div>
           <div class="flex items-center gap-1 rounded-lg p-0.5" style="background: var(--bg-card); border: 1px solid var(--border-subtle);">

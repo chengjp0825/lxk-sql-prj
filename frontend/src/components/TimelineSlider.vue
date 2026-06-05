@@ -14,6 +14,10 @@
       <template v-else><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Time selected &mdash; click anywhere to re-select</template>
     </div>
 
+    <div v-if="nowSlotIndex >= 0" class="flex items-center gap-2 mb-2 text-[10px] font-bold" style="color: #f43f5e;">
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+      Current time — slots before now are locked
+    </div>
     <div class="p-4 rounded-xl" style="background: var(--bg-card); border: 1px solid var(--border-subtle);" @mouseleave="onMouseLeave">
       <div class="grid gap-[2px]" :style="{ gridTemplateColumns: `repeat(${slots.length}, 1fr)` }">
         <div v-for="(slot, index) in slots" :key="index" @click="onClick(index)" @mouseenter="onMouseEnter(index)"
@@ -86,7 +90,12 @@ const previewRange = computed(() => {
   return { lo, hi }
 })
 
+const todayStr = new Date().toISOString().split('T')[0]
+const nowMinutes = new Date().getHours()*60+new Date().getMinutes()
+const nowSlotIndex = computed(() => selectedDate.value!==todayStr ? -1 : Math.max(-1, Math.floor((nowMinutes-8*60)/30)))
+
 const slotStyle = (slot,index) => {
+  if(nowSlotIndex.value>=0&&index<=nowSlotIndex.value) return { background:'rgba(148,163,184,0.03)', color:'#334155', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.3' }
   if(slot.status==='pending') return { background:'rgba(245,158,11,0.1)', color:'#f59e0b', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.5' }
   if(slot.status==='occupied') return { background:'rgba(148,163,184,0.05)', color:'#475569', cursor:'not-allowed', border:'1px solid transparent', opacity:'0.4' }
   const cr=confirmedRange.value; const pr=previewRange.value
@@ -101,6 +110,7 @@ const slotStyle = (slot,index) => {
 }
 
 const onClick = (index) => {
+  if(nowSlotIndex.value>=0&&index<=nowSlotIndex.value) return
   if(slots.value[index].status!=='available') return
   if(selectionStep.value==='IDLE'){error.value='';endIndex.value=null;startIndex.value=index;selectionStep.value='SELECTING_END';hoverIndex.value=index;return}
   if(selectionStep.value==='SELECTING_END'){

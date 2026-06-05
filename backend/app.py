@@ -336,6 +336,7 @@ def create_booking():
     room_id = data.get('room_id')
     start_time_str = data.get('start_time')
     end_time_str = data.get('end_time')
+    reason = (data.get('reason') or '').strip()
 
     if not room_id or not start_time_str or not end_time_str:
         return jsonify({'error': 'room_id, start_time and end_time required'}), 400
@@ -353,7 +354,7 @@ def create_booking():
     if duration > timedelta(hours=4):
         return jsonify({'error': 'Booking duration cannot exceed 4 hours'}), 400
 
-    if start_time < datetime.utcnow() + timedelta(minutes=15):
+    if start_time < datetime.now() + timedelta(minutes=15):
         return jsonify({'error': 'Booking must be at least 15 minutes in the future'}), 400
 
     db = get_db()
@@ -380,7 +381,8 @@ def create_booking():
             room_id=room_id,
             start_time=start_time,
             end_time=end_time,
-            status='pending'
+            status='pending',
+            reason=reason
         )
         db.add(booking)
         db.commit()
@@ -392,7 +394,8 @@ def create_booking():
                 'room_id': booking.room_id,
                 'start_time': booking.start_time.isoformat(),
                 'end_time': booking.end_time.isoformat(),
-                'status': booking.status
+                'status': booking.status,
+                'reason': booking.reason
             }
         }), 201
     finally:
@@ -406,14 +409,20 @@ def get_my_bookings():
     try:
         bookings = db.query(Booking).filter(Booking.user_id == g.user_id).order_by(Booking.created_at.desc()).all()
         result = []
+        now = datetime.now()
         for b in bookings:
             room = db.query(Room).filter(Room.id == b.room_id).first()
+            display_status = b.status
+            if b.status in ('pending', 'approved') and b.end_time < now:
+                display_status = 'expired'
             result.append({
                 'id': b.id,
                 'room': {'id': room.id, 'name': room.name, 'floor': room.floor} if room else None,
                 'start_time': b.start_time.isoformat(),
                 'end_time': b.end_time.isoformat(),
-                'status': b.status,
+                'status': display_status,
+                'reason': b.reason or '',
+                'admin_reason': b.admin_reason or '',
                 'created_at': b.created_at.isoformat()
             })
         return jsonify({'bookings': result}), 200
@@ -452,7 +461,7 @@ def cancel_booking(booking_id):
 def get_all_pending_bookings():
     db = get_db()
     try:
-        bookings = db.query(Booking).filter(Booking.status == 'pending').order_by(Booking.created_at.desc()).all()
+        bookings = db.query(Booking).filter(Booking.status == 'pending', Booking.end_time > datetime.now()).order_by(Booking.created_at.desc()).all()
         result = []
         for b in bookings:
             room = db.query(Room).filter(Room.id == b.room_id).first()
@@ -464,6 +473,7 @@ def get_all_pending_bookings():
                 'start_time': b.start_time.isoformat(),
                 'end_time': b.end_time.isoformat(),
                 'status': b.status,
+                'reason': b.reason or '',
                 'created_at': b.created_at.isoformat()
             })
         return jsonify({'bookings': result}), 200
@@ -479,6 +489,7 @@ def update_booking_status(booking_id):
         return jsonify({'error': 'No data provided'}), 400
 
     new_status = data.get('status')
+    admin_reason = (data.get('admin_reason') or '').strip()
     if new_status not in ['approved', 'rejected']:
         return jsonify({'error': 'Status must be approved or rejected'}), 400
 
@@ -488,7 +499,14 @@ def update_booking_status(booking_id):
         if not booking:
             return jsonify({'error': 'Booking not found'}), 404
 
+        if booking.status != 'pending':
+            return jsonify({'error': 'Booking is no longer pending'}), 400
+
+        if booking.end_time < datetime.now():
+            return jsonify({'error': 'Cannot act on expired booking'}), 400
+
         booking.status = new_status
+        booking.admin_reason = admin_reason
         db.commit()
         return jsonify({
             'message': f'Booking {new_status}',

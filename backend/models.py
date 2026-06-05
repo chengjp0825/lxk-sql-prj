@@ -40,6 +40,8 @@ class Booking(Base):
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     status = Column(String(20), default='pending', nullable=False)
+    reason = Column(Text, default='', nullable=True)
+    admin_reason = Column(Text, default='', nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

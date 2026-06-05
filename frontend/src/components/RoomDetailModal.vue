@@ -9,6 +9,10 @@
         <button @click="$emit('close')" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors text-lg" style="color: var(--text-muted);">&times;</button>
       </div>
       <div class="px-6 pb-2"><TimelineSlider v-if="room.id" :room-id="room.id" @select="handleSelect" /></div>
+      <div class="px-6 pb-3">
+        <label class="block text-xs font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary);">Reason (optional)</label>
+        <textarea v-model="reason" rows="2" class="w-full px-4 py-2.5 border rounded-xl text-sm resize-none focus:outline-none focus:border-indigo-400/40 transition-all" style="background: var(--bg-input); border-color: var(--border-strong); color: var(--text-primary);" placeholder="e.g. 项目讨论、客户会议..."></textarea>
+      </div>
       <div class="px-6 py-4 flex items-center gap-3 border-t" style="border-color: var(--border-subtle); background: var(--bg-hover);">
         <button @click="$emit('close')" class="px-4 py-2.5 rounded-xl text-sm font-medium transition-all" style="color: var(--text-secondary);">Cancel</button>
         <button @click="handleSubmit" :disabled="!selectedTime || loading" class="flex-1 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-25 disabled:cursor-not-allowed"
@@ -28,7 +32,7 @@ import api from '../api'
 import TimelineSlider from './TimelineSlider.vue'
 const props = defineProps({ room: { type: Object, required: true } })
 const emit = defineEmits(['close', 'booking-created'])
-const selectedTime = ref(null); const loading = ref(false); const success = ref(false); const error = ref('')
+const selectedTime = ref(null); const reason = ref(''); const loading = ref(false); const success = ref(false); const error = ref('')
 const roomIcon = props.room.capacity <= 6 ? '\u{1F4AC}' : props.room.capacity <= 15 ? '\u{1F4CA}' : '\u{1F3A4}'
 const handleSelect = (time) => { selectedTime.value = time; error.value = '' }
 const handleSubmit = async () => {
@@ -37,8 +41,8 @@ const handleSubmit = async () => {
   try {
     const dateStr = selectedTime.value.date || new Date().toISOString().split('T')[0]
     const [sh,sm]=selectedTime.value.start.split(':'); const [eh,em]=selectedTime.value.end.split(':')
-    await api.post('/bookings', { room_id: props.room.id, start_time: `${dateStr}T${String(sh).padStart(2,'0')}:${String(sm).padStart(2,'0')}:00`, end_time: `${dateStr}T${String(eh).padStart(2,'0')}:${String(em).padStart(2,'0')}:00` })
-    success.value = true; emit('booking-created'); setTimeout(() => emit('close'), 800)
+    await api.post('/bookings', { room_id: props.room.id, reason: reason.value, start_time: `${dateStr}T${String(sh).padStart(2,'0')}:${String(sm).padStart(2,'0')}:00`, end_time: `${dateStr}T${String(eh).padStart(2,'0')}:${String(em).padStart(2,'0')}:00` })
+    reason.value = ''; success.value = true; emit('booking-created'); setTimeout(() => emit('close'), 800)
   } catch (e) { error.value = e.response?.data?.error || 'Failed to book' } finally { loading.value = false }
 }
 </script>

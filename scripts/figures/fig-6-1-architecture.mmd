@@ -1,0 +1,25 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#dce8fc', 'primaryTextColor': '#1a1a2e', 'primaryBorderColor': '#3b5998', 'lineColor': '#555555', 'fontSize': '13px', 'fontFamily': 'SimHei'}}}%%
+flowchart LR
+    subgraph F["Vue 3 SPA 前端"]
+        direction TB
+        F1["4 Views"]
+        F2["8 Components"]
+        F3["Composables"]
+        F4["axios + JWT"]
+        F1 --> F2 --> F3 --> F4
+    end
+
+    subgraph B["Flask REST 后端"]
+        direction TB
+        B1["JWT 鉴权"]
+        B2["16 API 端点"]
+        B3["防冲突算法"]
+        B4["SQLAlchemy ORM"]
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph D["SQLite 数据库"]
+        DB[("meeting.db")]
+    end
+
+    F -- "HTTP JSON" --> B --> D

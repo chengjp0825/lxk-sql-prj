@@ -1,0 +1,38 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f0fe', 'primaryTextColor': '#1a1a2e', 'primaryBorderColor': '#4a6fa5', 'lineColor': '#666666', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'fontSize': '12px', 'fontFamily': 'SimHei'}}}%%
+sequenceDiagram
+    actor User as 用户
+    participant Vue as Vue 前端
+    participant Flask as Flask 后端
+    participant DB as SQLite 数据库
+
+    User ->> Vue: 选择房间和时间段，点击提交
+    activate Vue
+
+    Vue ->> Vue: 前端校验 (时长≤4h, 理由必填)
+
+    Vue ->> Flask: POST /api/bookings + Bearer JWT
+    activate Flask
+
+    Flask ->> Flask: 解析 JWT Token, 注入用户身份
+
+    Flask ->> Flask: 时长有效性 + 时间合法性校验
+
+    Flask ->> DB: SELECT 重叠查询 (IDX_room_time 索引)
+    activate DB
+
+    alt 时间段冲突 (Overlap 命中)
+        DB -->> Flask: 返回重叠记录
+        Flask -->> Vue: 409 Conflict
+        Vue -->> User: 提示时段冲突
+    else 合法请求
+        DB -->> Flask: 无重叠冲突
+        Flask ->> DB: INSERT INTO bookings
+        DB -->> Flask: COMMIT OK
+        Flask -->> Vue: 201 Created
+        Vue ->> Vue: 通知徽章 poke, 时间轴刷新
+        Vue -->> User: 预约提交成功
+    end
+
+    deactivate DB
+    deactivate Flask
+    deactivate Vue

@@ -19,6 +19,7 @@ cd lxk-sql-prj
 ### 2. Backend Setup
 
 ```bash
+cd C:\Users\chengbigdan\Desktop\prj\sql-prj
 cd backend
 pip install -r requirements.txt
 
@@ -32,6 +33,7 @@ python app.py
 ### 3. Frontend Setup
 
 ```bash
+cd C:\Users\chengbigdan\Desktop\prj\sql-prj
 cd frontend
 npm install
 

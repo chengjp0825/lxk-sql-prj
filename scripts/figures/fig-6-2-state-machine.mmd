@@ -1,0 +1,31 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#dce8fc', 'primaryTextColor': '#1a1a2e', 'primaryBorderColor': '#3b5998', 'lineColor': '#555555', 'fontSize': '14px', 'fontFamily': 'SimHei'}}}%%
+stateDiagram-v2
+    [*] --> IDLE
+
+    IDLE --> START_SELECTED: 第1次点击空闲块 (a)
+
+    START_SELECTED --> HOVER_PREVIEW: 鼠标移到其他块 (b)
+    START_SELECTED --> CONFIRMED: 第2次点击空闲块 (c)
+    START_SELECTED --> IDLE: 点击已选块移除 (d)
+
+    HOVER_PREVIEW --> CONFIRMED: 点击确认 (c)
+    HOVER_PREVIEW --> IDLE: 点击已选块移除 (d)
+    HOVER_PREVIEW --> BLOCKED: 预览区间碰到占用块
+
+    BLOCKED --> HOVER_PREVIEW: 自动收缩至障碍前
+    BLOCKED --> OVER_4H: 区间超过4小时
+
+    OVER_4H --> IDLE: 阻断并提示最长4小时
+
+    CONFIRMED --> IDLE: 点击任意处重新选择
+    CONFIRMED --> START_SELECTED: 点击新空闲块 (e)
+
+    state HOVER_PREVIEW {
+        note1: 实时碰撞拦截
+    }
+    state BLOCKED {
+        note2: 障碍阻断
+    }
+    state CONFIRMED {
+        note3: emit select 事件
+    }

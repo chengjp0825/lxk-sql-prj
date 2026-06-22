@@ -1,0 +1,37 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f0fe', 'primaryTextColor': '#1a1a2e', 'primaryBorderColor': '#4a6fa5', 'lineColor': '#4a6fa5', 'secondaryColor': '#f0f0f0', 'tertiaryColor': '#ffffff', 'fontSize': '13px', 'fontFamily': 'SimHei'}}}%%
+erDiagram
+    User ||--o{ Booking : "1 创建 N"
+    Room ||--o{ Booking : "1 被预约 N"
+
+    User {
+        int id PK "主键"
+        string username "学号/工号"
+        string password_hash "pbkdf2 哈希"
+        string role "user / admin"
+        datetime created_at
+    }
+
+    Room {
+        int id PK "主键"
+        string name "会议室名称"
+        string floor "楼层"
+        int capacity "容纳人数"
+        string status "active / disabled"
+        float pos_x "平面图 X 坐标"
+        float pos_y "平面图 Y 坐标"
+        datetime created_at
+    }
+
+    Booking {
+        int id PK "主键"
+        int user_id FK "→ User"
+        int room_id FK "→ Room"
+        datetime start_time "开始时间"
+        datetime end_time "结束时间"
+        string status "pending/approved/rejected/cancelled"
+        string reason "申请理由"
+        string admin_reason "审批意见"
+        string cancel_reason "取消理由"
+        datetime reviewed_at "审批时间"
+        datetime cancelled_at "取消时间"
+    }
